@@ -1,0 +1,1825 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+	<title>Monte Carlo Methoden in der Modellierung von Krankheitsausbrüchen</title>
+
+	<link rel="stylesheet" href="dist/reset.css">
+	<link rel="stylesheet" href="dist/reveal.css">
+	<link rel="stylesheet" href="dist/theme/mpi.css" id="theme">
+
+	<!-- Theme used for syntax highlighted code -->
+	<!-- Theme used for syntax highlighting of code -->
+	<link rel="stylesheet" href="lib/css/zenburn.css">
+
+	<!-- Printing and PDF exports -->
+	<script>
+		var link = document.createElement( 'link' );
+		link.rel = 'stylesheet';
+		link.type = 'text/css';
+		link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+		document.getElementsByTagName( 'head' )[0].appendChild( link );
+	</script>
+
+</head>
+
+<body>
+<div class="reveal">
+<div class="slides">
+
+
+
+<!-- ############################################################################### -->
+<section style="min-height:1080px">
+    <div style="padding-top:100px">
+        <h2>Monte Carlo Methoden in der Modellierung von Krankheitsausbrüchen</h2>
+    </div>
+    
+    <div style="padding-top:120px">
+        <b>Johannes Zierenberg</b><br><br>
+        <!--Neural Systems Theory<br>-->
+        Max Planck Institute for Dynamics and Self-Organization, Göttingen, Germany<br>
+    </div>
+    
+    <div style="position:absolute; bottom:0; width:100%">
+      <img src="logos/Max-Planck-Gesellschaft.svg" height=300 style="border:0; box-shadow:none; background:none;margin-right:50px" align=right >
+      <img src="logos/JHS_Logo_sRGB_violett.jpg"   height=300 style="border:0; box-shadow:none; background:none;margin-right:50px" align=left >
+    </div>
+</section>
+
+<!-- Total: ~3 hours-->
+<!-- Introduction: ~15 Minuten-->
+<!-- Part  I: ~40 Minuten-->
+<!-- Pause/Questions: ~10 Minuten-->
+<!-- Part II: ~60 Minuten-->
+<!-- Pause/Questions: ~10 Minuten-->
+<!-- Introduction to practial part-->
+
+
+<!-- ############################################################################### -->
+<!-- Introduction: ~10 Minuten-->
+<!-- * Verständnis-->
+<!-- * Vorhersage-->
+<!-- * Szenarien-->
+<section style="min-height:1080px">
+    <h3>Warum sollten wir Krankeitsausbrüche modellieren?</h3>
+    <div style="position:absolute; top:12%; left: 1%; width:55%; text-align:left" class="fragment fade-in" data-fragment-index="2" data-markdown>
+      <script type="text/template">
+        * Welche Parameter beschreiben den Ausbruch? <!-- .element: class="fragment fade-in" data-fragment-index="2" -->
+        * Welche Modellbeiträge sind relevant? Quarantäne? <!-- .element: class="fragment fade-in" data-fragment-index="3" -->
+        * Wo stehen wir in der Pandemie? <!-- .element: class="fragment fade-in" data-fragment-index="4" -->
+        * Was sind die wahrscheinlichsten Pfade der Verbreitung?<!-- .element: class="fragment fade-in" data-fragment-index="5" -->
+        * Wie sollen wir impfen? <!-- .element: class="fragment fade-in" data-fragment-index="6" -->
+      </script>
+    </div>
+
+    <span class="fragment fade-in-then-out" data-fragment-index="2">
+        <img src="./sources/covid/2020_li_science_fig1.png" width=45% style=";position:absolute; left:55%; top:25%; border:0; box-shadow:none; background:none;" align=center >
+    </span>
+    <span class="fragment fade-in-then-out" data-fragment-index="3">
+        <img src="./sources/covid/2020_maier_science_fig1.png" width=45% style="position:absolute; left:55%; top:25%;border:0; box-shadow:none; background:none;" align=center >
+    </span>
+    <span class="fragment fade-in-then-out" data-fragment-index="4">
+        <img src="./sources/covid/2020_dehning_science_figSummary.png" width=45% style="position:absolute; left:55%; top:25%; border:0; box-shadow:none; background:none;" align=center >
+    </span>
+    <span class="fragment fade-in-then-out" data-fragment-index="5">
+        <img src="./sources/covid/2013_brockmann_science_fig1.png" width=45% style="position:absolute; left:55%; top:25%; border:0; box-shadow:none; background:none;" align=center >
+    </span>
+    <span class="fragment fade-in-then-out" data-fragment-index="6">
+        <img src="./sources/covid/2003_keeling_nature_fig1.png" width=35% style="position:absolute; left:55%; top:5%; border:0; box-shadow:none; background:none;" align=center >
+    </span>
+
+    <div style="position:absolute; bottom:1%; left:1.0%; width=98%; text-align:left">
+        <small>
+        <br>
+        <span class="fragment fade-in" data-fragment-index="6">Keeling et al., Nature (2003)</span><br>
+        <span class="fragment fade-in" data-fragment-index="5">Brockmann & Helbig, Science (2013)</span><br>
+        <span class="fragment fade-in" data-fragment-index="4">Dehning et al., Science (2020)</span><br>
+        <span class="fragment fade-in" data-fragment-index="3">Maier & Brockmann, Science (2020)</span><br>
+        <span class="fragment fade-in" data-fragment-index="2">Li et al., Science (2020)</span><br>
+        </small>
+    </div>
+</section>
+
+<!-- Introduction: Krankheitsverlauf-->
+<section style="min-height:1080px">
+    <h3>Krankheitsverlauf eines Individuum</h3>
+    <img src="./sources/covid/2020_Cevik_disease_development.png" width=60%  style="border:0; box-shadow:none; position:absolute; top:5%; left:20%">
+
+    <span class="fragment fade-in" data-frament-index=1>
+        <img src="./sources/covid/2020_dehning_medrxiv_fig1.png" width=60%  style="border:0; box-shadow:none; position:absolute; top:65%; left:20%">
+    </span>
+    <div style="position:absolute; bottom:1%; left:1.0%; width=98%; text-align:left">
+      <small>
+        <br>
+        Cevik et al., BMJ (2020).<br>
+      </small>
+    </div>
+</section>
+
+<!-- Introduction: Ausbreitung in der Gesellschaft-->
+<!-- * Shape the dilemma -->
+<section style="min-height:1080px">
+    <h3>Krankheitsverbreitung in einer Gesellschaft</h3>
+    
+    <span class="fragment fade-in-then-out" data-fragment-index="1">
+        <img src="./sources/covid/2017_kiss_mathematics_of_epidemics_fig1.1.png" width=40% style=";position:absolute; left:30%; top:10%; border:0; box-shadow:none; background:none;" align=center >
+    </span>
+    <span class="fragment fade-in" data-fragment-index="2">
+        <img src="./sources/covid/2017_kiss_mathematics_of_epidemics_fig1.2.png" width=50% style=";position:absolute; left:25%; top:5%; border:0; box-shadow:none; background:none;" align=center >
+    </span>
+    <span class="fragment fade-in" data-fragment-index="3">
+        <img src="./sources/covid/2017_kiss_mathematics_of_epidemics_fig2.1.png" width=40% style=";position:absolute; left:2%; top:55%; border:0; box-shadow:none; background:none;" align=center >
+    </span>
+    <span class="fragment fade-in" data-fragment-index="4">
+        <img src="./sources/covid/2017_kiss_mathematics_of_epidemics_fig3.1.png" width=32% style="clip-path:inset(12% 0 0 0);position:absolute; left:65%; top:48%; border:0; box-shadow:none; background:none;" align=center >
+    </span>
+
+    <div style="position:absolute; bottom:1%; left:1.0%; width=98%; text-align:left">
+        <small>
+            <br>Kiss, Miller & Simon, <i>Mathematics of Epidemics on Networks</i> (2017) <br>
+        </small>
+    </div>
+</section>
+
+<!-- Introduction: Unsicherheit-->
+<section style="min-height:1080px">
+    <h3>Wo ist das Problem?</h3>
+    <div data-markdown style="position:absolute; top:8%; left: 1%; width:98%; text-align:left">
+      <script type="text/template">
+        * Starke Fluktuationen im Krankheitsverlauf.<!-- .element: class="fragment fade-in" data-fragment-index="2" -->
+        * Starke Fluktuationen im Kontaktverhalten.<!-- .element: class="fragment fade-in" data-fragment-index="3" -->
+        * Ansteckung bei Kontakt ist probabilisitisch und zeitlich variabel.<!-- .element: class="fragment fade-in" data-fragment-index="4" -->
+        * Krankheitsausbruch ist eine spezifische Realisierung solch eines Zufallsprozesses.<!-- .element: class="fragment fade-in" data-fragment-index="5" -->
+      </script>
+    </div>
+    <h4 class="fragment fade-in" data-fragment-index="10" style="position:absolute; top:30%; left: 1%; width:98%; text-align:left">
+        Mögliche Ansätze:
+    </h4>
+
+    <div class="fragment fade-in" data-fragment-index="10"  style="position:absolute; top:40%; left: 0%; width:50%; text-align:center">
+        Inferenz
+    </div>
+    <span class="fragment fade-in" data-fragment-index="10">
+        <img src="./sources/icon_part2.svg" width=20% style="border:0; box-shadow:none; position:absolute; top:45%;left:15%" >
+    </span>
+
+    <div data-markdown style="position:absolute; top:85%; left: 1%; width:49%; text-align:left">
+      <script type="text/template">
+        * Starke Vereinfachung für wenig Parameter.<!-- .element: class="fragment fade-in" data-fragment-index="11" -->
+        * Instabil bei hoher Parameterzahl.<!-- .element: class="fragment fade-in" data-fragment-index="12" -->
+        * Projektion Daten in Modellraum.<!-- .element: class="fragment fade-in" data-fragment-index="13" -->
+      </script>
+    </div>
+
+    <div class="fragment fade-in" data-fragment-index="20"  style="position:absolute; top:40%; left: 50%; width:50%; text-align:center">
+        Stochastische Simulationen
+    </div>
+    <span class="fragment fade-in" data-fragment-index="20">
+        <img src="./sources/icon_part3.svg" width=20% style="border:0; box-shadow:none; position:absolute; top:45%;left:65%" >
+    </span>
+
+    <div data-markdown style="position:absolute; top:85%; left: 51%; width:49%; text-align:left">
+      <script type="text/template">
+        * Starke Annahmen bei Krankheitsverlauf.<!-- .element: class="fragment fade-in" data-fragment-index="21" -->
+        * Starke Annahmen bei Netzwerken.<!-- .element: class="fragment fade-in" data-fragment-index="22" -->
+        * Wahl der Details beinflusst Ergebnisse.<!-- .element: class="fragment fade-in" data-fragment-index="23" -->
+      </script>
+    </div>
+</section>
+
+<!-- ############################################################################### -->
+<section style="min-height:1080px">
+    <div style="position:absolute; top:10%; left:20%; width:60%; height:20%; text-align:left; border:3px; border-style:solid; border-color:#708090; padding: 0.2em;">
+        <img src="./sources/icon_part1.svg" height=90% style="border:0; box-shadow:none; position:absolute; top:0%;left:2%" >
+        <h2 style="border:0; box-shadow:none; position:absolute; top:30%; left:28%">Monte Carlo 101</h2>
+    </div>
+
+    <div style="position:absolute; top:40%; left:20%; width:60%; height:20%;  text-align:left; border:3px; border-style:solid; border-color:#708090; padding: 0.2em;">
+        <img src="./sources/icon_part2.svg" height=90%  style="border:0; box-shadow:none; position:absolute; top:0%;left:2%" >
+        <h2 style="border:0; box-shadow:none; position:absolute; top:15%; left:28%">Inferenz Krankheitsparameter</h2>
+    </div>
+    
+    <div style="position:absolute; top:70%; left:20%; width:60%; height:20%;  text-align:left; border:3px; border-style:solid; border-color:#708090; padding: 0.2em;">
+        <img src="./sources/icon_part3.svg" height=90%  style="border:0; box-shadow:none; position:absolute; top:0%;left:2%" >
+        <h2 style="border:0; box-shadow:none; position:absolute; top:15%; left:28%">Simulation stochastischer Krankheitsausbreitung</h2>
+    </div>
+</section>
+
+<!-- ############################################################################### -->
+<!-- Part 1: Monte Carlo-->
+<!-- add reference to gambling -->
+<section style="min-height:1080px">
+    <img src="./sources/icon_part1.svg" height=12%  style="border:0; box-shadow:none; position:absolute; top:1%;right:1%" >
+    <h3>Monte Carlo 101</h3>
+    <div style="position:absolute; top:12%; left: 1%; width:50%; text-align:left" class="fragment fade-in" data-fragment-index="0" data-markdown>
+      <script type="text/template">
+        Die Bezeichnung "Monte Carlo Methode" ist sehr allgemein und wird in vielen Bereichen ganz unterschiedlich verwendet.
+
+        Beispiele:
+        * Model fitting <!-- .element: class="fragment fade-in" data-fragment-index="2" -->
+        * Risikoanalyse <!-- .element: class="fragment fade-in" data-fragment-index="3" -->
+        * Finanzmodelle <!-- .element: class="fragment fade-in" data-fragment-index="4" -->
+        * Chemische Reaktionsprozesse <!-- .element: class="fragment fade-in" data-fragment-index="5" -->
+        * Statistische Physik <!-- .element: class="fragment fade-in" data-fragment-index="6" -->
+        * ... <!-- .element: class="fragment fade-in" data-fragment-index="7" -->
+
+
+        Was wir lernen werden: <!-- .element: class="fragment fade-in" data-fragment-index="20" -->
+        * Monte Carlo methode sehr allgemein <!-- .element: class="fragment fade-in" data-fragment-index="21" -->
+        * Was ist simple sampling? <!-- .element: class="fragment fade-in" data-fragment-index="22" -->
+        * Was ist importance sampling? <!-- .element: class="fragment fade-in" data-fragment-index="23" -->
+        * Was ist der Metropolis algorithmus? <!-- .element: class="fragment fade-in" data-fragment-index="24" -->
+      </script>
+    </div>
+    <span class="fragment fade-in-then-out" data-fragment-index="2">
+        <img src="./sources/covid/2020_dehning_science_figSummary.png" width=45% style="position:absolute; left:55%; top:25%; border:0; box-shadow:none; background:none;" align=center >
+      <div style="position:absolute; bottom:1%; left:1.0%; width=98%; text-align:left">
+        <small>
+          <br>
+          <span>Dehning et al., Science (2020)</span><br>
+        </small>
+      </div>
+    </span>
+    <span class="fragment fade-in-then-out" data-fragment-index="3">
+      <img src="./sources/monte-carlo/nasa_monte_carlo_simulation_risk_analysis.png" width=45%  style="border:0; box-shadow:none; position:absolute; top:5%; left:50%">
+      <div style="position:absolute; bottom:1%; left:1.0%; width=98%; text-align:left">
+        <small>
+          <br>
+          <span>Source: https://www.nasa.gov/specials/apollo50th/missions.html</span><br>
+        </small>
+      </div>
+    </span>
+    <span class="fragment fade-in-then-out" data-fragment-index="4">
+      <img src="./sources/monte-carlo/cfi_sensitivity-analysis.png" width=45%  style="border:0; box-shadow:none; position:absolute; top:20%; left:50%">
+      <div style="position:absolute; bottom:1%; left:1.0%; width=98%; text-align:left"  class="fragment fade-in-then-out" data-fragment-index="4">
+        <small>
+          <br>
+          Source: https://corporatefinanceinstitute.com/resources/knowledge/modeling/monte-carlo-simulation/<br>
+        </small>
+      </div>
+    </span>
+    <span class="fragment fade-in-then-out" data-fragment-index="5">
+      <img src="./sources/chemical_reactions/wikipedia_Drei_Reaktionen_zur_Darstellung.svg" width=40%  style="border:0; box-shadow:none; position:absolute; top:20%; left:55%">
+      <div style="position:absolute; bottom:1%; left:1.0%; width=98%; text-align:left">
+        <small>
+          <br>
+          <span>Source: wikipedia<br>
+        </small>
+      </div>
+    </span>
+    <span class="fragment fade-in-then-out" data-fragment-index="6">
+      <img src="./sources/monte-carlo/2015_zierenberg_pre_LJ.png" width=40%  style="border:0; box-shadow:none; position:absolute; top:12%; left:55%">
+      <div style="position:absolute; bottom:1%; left:1.0%; width=98%; text-align:left">
+        <small>
+          <br>Zierenberg et al., Nat. Commun. (2017)<br>
+        </small>
+      </div>
+    </span>
+
+    <div style="position:absolute; top:16%; left: 1%; width:50%; text-align:left" class="fragment fade-in" data-fragment-index="20">
+
+    </div>
+</section>
+
+<section style="min-height:1080px">
+    <img src="./sources/icon_part1.svg" height=12%  style="border:0; box-shadow:none; position:absolute; top:1%;right:1%" >
+    <h3>Monte Carlo 101: Ein Beispiel</h3>
+    <span class="fragment fade-out" data-fragment-index="1">
+        <img src="./sources/weblogos/onlineTED.svg" width=40%  style="border:0; box-shadow:none; position:absolute; top:20%; left:5%">
+    </span>
+    <span class="fragment fade-in" data-fragment-index="1">
+        <img src="./sources/custom/montecarlo_alter_histogram.png" width=50%  style="border:0; box-shadow:none; position:absolute; top:20%; left:2%">
+    </span>
+    <span class="fragment fade-in" data-fragment-index="2">
+        <div style="position:absolute; top:15%; left: 60%; width:40%; text-align:left">
+            Wir können aus diesen Daten jetzt verschiedene Informationen bestimmen
+            <br><br>
+            Mittelwert: <br>
+            $\overline{x} = \sum X P(x) \approx 23.8$
+            <br><br>
+            Varianz:<br>
+            $\overline{\left(x-\overline{x}\right)^2} = \sum X^2 P(x) - \overline{x}^2 \approx 7.03$
+            <br><br>
+            Fehler des Mittelwertes: <br>
+            Varianz/$\sqrt{N} \approx 1.2 $
+    </span>
+</section>
+
+<section style="min-height:1080px">
+    <img src="./sources/icon_part1.svg" height=12%  style="border:0; box-shadow:none; position:absolute; top:1%;right:1%" >
+    <h3>Monte Carlo 101: Simple sampling </h3>
+    <span class="fragment fade-in" data-fragment-index="1">
+        <img src="./sources/custom/montecarlo_alter_verteilung.png" width=45%  style="border:0; box-shadow:none; position:absolute; top:12%; left:2%">
+    </span>
+    <div style="position:absolute; top:15%; left: 55%; width:40%; text-align:left" class="fragment fade-in" data-fragment-index="1">
+        In unserem Beispiel war das Alter die Zufallsvariable und die
+        anwesenden Studenten waren unabhängige Realisierungen. Wir haben
+        also (mehr oder weniger) zufällig aus der Verteilung aller
+        Studenten gezogen.
+    </div>
+
+    <div style="position:absolute; top:75%; left: 5%; width:90%; text-align:left" class="fragment fade-in" data-fragment-index="2">
+        <b>Simple sampling:</b> <br>
+        Zufälliges erzeugen von Samples aus der Verteilung möglicher Realisierungen.  
+    </div>
+
+    <div style="position:absolute; top:90%; left: 5%; width:90%; text-align:left" class="fragment fade-in" data-fragment-index="3">
+        Simple sampling ist super, wenn man an dieser Verteilung interessiert ist 
+    </div>
+</section>
+
+<section style="min-height:1080px">
+    <img src="./sources/icon_part1.svg" height=12%  style="border:0; box-shadow:none; position:absolute; top:1%;right:1%" >
+    <h3>Monte Carlo 101: Gesetz der großen Zahlen</h3>
+    <img src="./sources/monte-carlo/wikipedia_400px-Lawoflargenumbers.svg.png" width=40%  style="border:0; box-shadow:none; position:absolute; top:12%; left:30%">
+  
+    <div style="position:absolute; top:60%; left: 2%; width:96%; text-align:left" class="fragment fade-in" data-fragment-index="2">
+        Gesetz der großen Zahlen: <br>
+        Das arithmitsche Mittel aus unabhängig und identisch verteilten (iid) Zufallsvariablen konvergiert zu deren Erwartungswert<br>
+        <br>
+        <span class="fragment fade-in" data-fragment-index="3">
+          Wir können also folgende Approximation verwenden $\mathbb{E}(X)\approx \overline{x}=\frac{1}{N}\left(x_1+x_2+...+x_N\right)$.
+        </span>
+    </div>
+
+    
+    <div style="position:absolute; bottom:1%; left:1.0%; width=98%; text-align:left">
+        <small>
+          <br>
+          <span>iid: independent and identically distributed</span><br>
+          <span>Source: wikipedia</span><br>
+        </small>
+    </div>
+</section>
+
+<section style="min-height:1080px">
+    <img src="./sources/icon_part1.svg" height=12%  style="border:0; box-shadow:none; position:absolute; top:1%;right:1%" >
+    <h3>Monte Carlo 101: $\pi$ berechnen</h3>
+    <img src="./sources/monte-carlo/wikipedia_pi_30K.gif" width=40%  style="border:0; box-shadow:none; position:absolute; top:12%; left:2%">
+    <div  style="border:0; box-shadow:none; position:absolute; top:12%; left:45%; width:50%; text-align:left">
+        <span class="fragment fade-in" data-fragment-index="3">
+            Die Kreiszahl $\pi$ für einen Kreis mit Radius 1 entspricht genau der Kreisfläche:<br>
+            $A = \pi r^2=\pi$
+            <br><br>
+        </span>
+        <span class="fragment fade-in" data-fragment-index="4">
+            Für zufällige Samples ($x\in[0,1]$, $y\in[0,1]$) liegt ein Teil der Samples im Kreis, und ein Teil außerhalb:<br>
+            $\frac{\text{Samples im TeilKreis}}{\text{Samples Gesamt}} = \frac{A_\text{TeilKreis}}{A_\text{Quadrat}}=\frac{\pi}{4}$
+        </span>
+        <!--
+        <span class="fragment fade-in" data-fragment-index="5">
+            $\phantom{\pi} = 4\int_{0}^{1}dx \int_{0}^{1}dy\,\, \Theta\left(1 - x^2 - y^2\right)P(x)P(y)$<br>
+        </span>
+        -->
+        <span class="fragment fade-in" data-fragment-index="6">
+            <br>
+            <br>
+            Was wir auch schreiben können als 
+            $\pi = 4\mathbb{E}_{xy}\left(\Theta\left(1 - x^2 - y^2\right)\right)$<br>
+            $\phantom{\pi} \approx \frac{4}{N}\sum_{i=1}^N \Theta\left(1 - x_i^2 - y_i^2\right)$<br>
+        </span>
+        <br><br><br>
+        <span class="fragment fade-in" data-fragment-index="4">
+            $x$, $y$ uniform verteilt in $[0,1]$
+        </span>
+    </div>
+    <div style="position:absolute; bottom:1%; left:1.0%; width=98%; text-align:left">
+        <small>
+          <br>
+          <span>Source: wikipedia</span><br>
+        </small>
+    </div>
+</section>
+
+<section style="min-height:1080px">
+    <img src="./sources/icon_part1.svg" height=12%  style="border:0; box-shadow:none; position:absolute; top:1%;right:1%" >
+    <h3>Monte Carlo 101: Wenn Samples noch gewichtet werden müssen</h3>
+    <div style="position:absolute; top:8%; left: 5%; width:90%; text-align:left" class="fragment fade-in" data-fragment-index="1">
+        Meistens sind wir an Verteilungen interessiert aus denen wir nicht direkt ziehen können.
+    </div>
+
+    <div style="position:absolute; top:15%; left: 2%; width:55%; text-align:left" class="fragment fade-in" data-fragment-index="2">
+        <b>Beispiel 1: Mittleres Alter von Physikstudenten</b><br>
+         Wenn wir nicht wissen, wer alles Physik studiert, müssten wir
+         eigentlich zufällige Samples aus der Bevölkerung ziehen und diese erst
+         auf Physikstudenten überprüfen:
+        $$
+        P(\text{alter} | \text{student}) \propto P(\text{student} | \text{alter}) \cdot P(\text{alter})
+        $$
+        Praktisch bedeutet dies, dass wir Zustände erzeugen und nur diese behalten, die Physikstudenten sind.
+    </div>
+
+    <div style="position:absolute; top:65%; left: 2%; width:55%; text-align:left" class="fragment fade-in" data-fragment-index="3">
+        <b>Beispiel 2: Statistische Mechanik</b><br>
+         In der Physik können wir in der Regel zufällige Zustände erzeugen,
+         müssen diese aber noch mit dem "Ensemblegewicht" gewichten
+        $$
+        P_\mathrm{can}(E) = P(E|NVT) = e^{-\beta E}\Omega(E)/Z
+        $$
+    </div>
+
+    <span class="fragment fade-in" data-fragment-index="4">
+        <p style="position:absolute; top:45%; left: 60%; width:40%; text-align:center">
+        Zustandsdichte des Ising Modells
+        </p>
+        <img src='./sources/muca/2018_gross_Fig7.png' width=40%  style="border:0; box-shadow:none; position:absolute; top:50%; left:60%">
+    </span>
+
+    <div style="position:absolute; bottom:1%; left:1.0%; width=98%; text-align:left">
+        <small>
+        <br>
+        <span class="fragment fade-in" data-fragment-index="4">Gross et al., Comput. Phys. Commun. (2018)</span><br>
+        </small>
+    </div>
+</section>
+
+<section style="min-height:1080px">
+    <img src="./sources/icon_part1.svg" height=12%  style="border:0; box-shadow:none; position:absolute; top:1%;right:1%" >
+    <h3>Monte Carlo 101: Importance sampling (Markov chain)</h3>
+    <div style="position:absolute; top:10%; left: 1%; width:50%; text-align:left" class="fragment fade-in" data-fragment-index="1">
+        Ziel: Erzeuge samples aus einer gewünschten Verteilung $P(x) \propto W(x)\Omega(x)$<br>
+        <span  class="fragment fade-in" data-fragment-index="2"> 
+            Statistische Mechanik: $P(E) = e^{-\beta E}\Omega(E)/Z$
+        </span>
+        <br>
+        <br>
+        <span  class="fragment fade-in" data-fragment-index="4"> 
+            Idee: Erzeuge neues sample aus dem Alten sodass $P(x)$ stationär bleibt (Markov chain)
+        </span>
+    </div>
+    <span class="fragment fade-in" data-fragment-index="2">
+        <img src="./sources/monte-carlo/weighted_samples.svg" width=30%  style="border:0; box-shadow:none; position:absolute; top:8%; left:60%">
+    </span>
+    <div style="position:absolute; top:40%; left: 1%; width:98%; text-align:left" class="fragment fade-in" data-fragment-index="1">
+        <span  class="fragment fade-in" data-fragment-index="5"> 
+            $$\dot{P}(x,t) = \int dx^\prime \left[P(x^\prime)p(x^\prime\to x) - P(x)p(x\to x^\prime)\right] \overset{!}{=}0$$
+        </span>
+        <span  class="fragment fade-in" data-fragment-index="6"> 
+            Detailed balance:
+            $\hspace{2em}P(x^\prime)p(x^\prime\to x) = P(x)p(x\to x^\prime) \to \frac{p(x\to x^\prime)}{p(x^\prime\to x)}= \frac{P(x^\prime)}{P(x)}$
+        </span>
+        <br>
+        <br>
+        <span  class="fragment fade-in" data-fragment-index="7"> 
+            Lösung:
+            $\hspace{10em}p(x\to x^\prime) = \text{min}\left(1,\frac{P(x^\prime)}{P(x)}\right)$
+        </span>
+        <span  class="fragment fade-in" data-fragment-index="8"> 
+            $\hspace{13em}\phantom{p(x\to x^\prime)} = \text{min}\left(1,e^{-\beta\Delta E}\right)$ [Metropolis]
+        </span>
+        <br>
+        <br>
+        <span  class="fragment fade-in" data-fragment-index="10"> 
+            Nachteil: Wir haben statistische Unabhängigkeit der samples verloren.
+        </span>
+    </div>
+
+    <div style="position:absolute; bottom:1%; left:1.0%; width=98%; text-align:left">
+        <small>
+        <br>
+        <span class="fragment fade-in" data-fragment-index="8">Metropolis et al., J. Chem. Phys. (1953)</span><br>
+        </small>
+    </div>
+</section>
+
+
+<section style="min-height:1080px">
+    <img src="./sources/icon_part1.svg" height=12%  style="border:0; box-shadow:none; position:absolute; top:1%;right:1%" >
+    <h3>Monte Carlo 101: Markov chain - Konvergenz</h3>
+    
+    <div style="position:absolute; top:10%; left: 1%; width:50%; text-align:left" class="fragment fade-in" data-fragment-index="1">
+        Bei importance sampling (Markov chain Monte Carlo) ist das erste Sample
+        in der Regel nicht eines mit hohem Gewicht ($P(x_0)\ll P_\mathrm{max}$). 
+    </div>
+
+    <div style="position:absolute; top:40%; left: 1%; width:50%; text-align:left" class="fragment fade-in" data-fragment-index="2">
+        Da die Markov chain korreliert ist, müssen wir also die ersten samples verwerfen. 
+        <br><br>
+        <span class="fragment fade-in" data-fragment-index="3">
+            In der Regel schaut man sich dafür das Konvergenzverhalten an bzw.
+            schätzt die Autokorrelationszeit der Markov chain ab.
+        </span>
+    </div>
+
+    <span class="fragment fade-in" data-fragment-index="1">
+        <img src="./sources/monte-carlo/weighted_samples.svg" width=30%  style="border:0; box-shadow:none; position:absolute; top:8%; left:60%">
+    </span>
+
+    <span class="fragment fade-in" data-fragment-index="3">
+        <img src="./sources/custom/inference_example_SIR_MC.png" width=60%  style="clip-path:inset(0% 45% 75% 0%);border:0; box-shadow:none; position:absolute; top:50%; left:55%">
+    </span>
+
+</section>
+
+<section style="min-height:1080px">
+    <img src="./sources/icon_part1.svg" height=12%  style="border:0; box-shadow:none; position:absolute; top:1%;right:1%" >
+    <h3>Monte Carlo 101: Markov chain - Ergodizität</h3>
+
+    <span class="fragment fade-out" data-fragment-index="30">
+    <div style="position:absolute; top:10%; left: 1%; width:50%; text-align:left" class="fragment fade-in" data-fragment-index="1">
+        Bei importance sampling (Markov chain Monte Carlo) ist eine gute
+        Kombination von "updates" (Vorschlag $x\to x^\prime$) maßgeblich.
+    </div>
+    
+    <div style="position:absolute; top:30%; left: 1%; width:50%; text-align:left" class="fragment fade-in" data-fragment-index="2">
+        Beispiel: $x^\prime = x + (-1 + 2r)\Delta x \qquad r \in [0,1) $
+    </div>
+
+    <div style="position:absolute; top:38%; left: 1%; width:50%; text-align:left" class="fragment fade-in" data-fragment-index="3">
+        Kleines $\Delta x \to $ hohe Annahmewahrscheinlichkeit.
+        Wir bleiben leichter innerhalb von dem Maximum der Verteilung.
+    </div>
+
+    <div style="position:absolute; top:55%; left: 1%; width:50%; text-align:left" class="fragment fade-in" data-fragment-index="10">
+        Allerdings könnten wir bei kleinen $\Delta x$ ganze Bereiche des
+        Zustandsraumes verpassen. Der Algorithmus wäre dann nicht mehr
+        ergodisch.
+    </div>
+    
+    <div style="position:absolute; top:72%; left: 1%; width:50%; text-align:left" class="fragment fade-in" data-fragment-index="11">
+        (eine) Lösung:
+        $$
+            x^\prime_1 = x + (-1 + 2r)\Delta x_1 \qquad r \in [0,1)\\
+            x^\prime_2 = x + (-1 + 2r)\Delta x_2 \qquad r \in [0,1)
+        $$
+    </div>
+    </span>
+
+    <span class="fragment fade-in" data-fragment-index="2">
+        <img src="./sources/monte-carlo/weighted_samples.svg" width=30%  style="border:0; box-shadow:none; position:absolute; top:8%; left:60%">
+    </span>
+    <span class="fragment fade-in" data-fragment-index="10">
+        <img src="./sources/monte-carlo/stat_mech_distribution_first_order.svg" width=30%  style="border:0; box-shadow:none; position:absolute; top:50%; left:60%">
+    </span>
+    <span class="fragment fade-in" data-fragment-index="20">
+        <img src="./sources/particles/2017_zierenberg_fig1.png" width=90%  style="clip-path:inset(0% 50% 0% 0%);border:0; box-shadow:none; position:absolute; top:8%; left:55%">
+    </span>
+    <span class="fragment fade-in" data-fragment-index="30">
+        <img src="./sources/polymers/2015_zierenberg_epl_fig3.png" width=45%  style="border:0; box-shadow:none; position:absolute; top:8%; left:5%">
+    </span>
+
+    <div style="position:absolute; bottom:1%; left:1.0%; width=98%; text-align:left">
+        <small>
+        <br>
+        <span class="fragment fade-in" data-fragment-index="30">Zierenberg et al., Europhys. Lett. (2015)</span><br>
+        <span class="fragment fade-in" data-fragment-index="20">Zierenberg et al., Nat. Commun. (2017)</span><br>
+        </small>
+    </div>
+</section>
+
+
+<section style="min-height:1080px">
+    <img src="./sources/icon_part1.svg" height=12%  style="border:0; box-shadow:none; position:absolute; top:1%;right:1%" >
+    <h3>Monte Carlo 101: Was haben wir gelernt?</h3>
+    <div style="position:absolute; top:12%; left: 1%; width:50%; text-align:left" class="fragment fade-in" data-fragment-index="0" data-markdown>
+      <script type="text/template">
+        * Monte Carlo ist effektiv sampling einer (unbekannten) Verteilung P(x) und somit gibt es ein breites Spektrum an Anwendungen. <!-- .element: class="fragment fade-in" data-fragment-index="0" -->
+        * Simple sampling erzeugt unabhängige samples. Scheitert wenn die erzeugten samples ein geringes Gewicht haben ($P(x_i)\ll P_\mathrm{max}$).  <!-- .element: class="fragment fade-in" data-fragment-index="2" -->
+        * Importance sampling erzeugt korrelierte samples (Markov chain) aus beliebiger Verteilung $P(x)$. Markov chain muss aber auf Konvergenz und Ergodizität geprüft werde! <!-- .element: class="fragment fade-in" data-fragment-index="3" -->
+      </script>
+    </div>
+    <!--
+        * Auch Nichtgleichgewichtsprozesse können stochastisch gesampled werden (eher simple sampling)
+        -->
+
+    <span class="fragment fade-in-then-out" data-fragment-index="2">
+        <img src="./sources/custom/montecarlo_alter_verteilung.png" width=45%  style="border:0; box-shadow:none; position:absolute; top:12%; left:52%">
+    </span>
+
+    <span class="fragment fade-in-then-out" data-fragment-index="3">
+        <img src="./sources/monte-carlo/weighted_samples.svg" width=30%  style="border:0; box-shadow:none; position:absolute; top:8%; left:60%">
+        <img src="./sources/custom/inference_example_SIR_MC.png" width=60%  style="clip-path:inset(0% 45% 75% 0%);border:0; box-shadow:none; position:absolute; top:50%; left:55%">
+    </span>
+
+    <!--
+    <span class="fragment fade-in-then-out" data-fragment-index="4">
+        <img src="sources/custom/kineticMC_example_I0_1.png" width=45%  style="border:0; box-shadow:none; position:absolute; top:12%; left:52%">
+    </span>
+    -->
+</section>
+
+
+<!-- ############################################################################### -->
+<!-- ############################################################################### -->
+<!-- ############################################################################### -->
+<section style="min-height:1080px">
+    <div style="position:absolute; top:10%; left:20%; width:60%; height:20%;  text-align:left; border:3px; border-style:solid; border-color:#708090; padding: 0.2em;">
+        <img src="./sources/icon_part1.svg" height=90% style="border:0; box-shadow:none; position:absolute; top:0%;left:2%" >
+        <h2 style="border:0; box-shadow:none; position:absolute; top:30%; left:28%">Monte Carlo 101</h2>
+    </div>
+
+    <div style="position:absolute; top:40%; left:20%; width:60%; height:20%;  text-align:left; border:3px; border-style:solid; border-color:#708090; padding: 0.2em;">
+        <img src="./sources/icon_part2.svg" height=90%  style="border:0; box-shadow:none; position:absolute; top:0%;left:2%" >
+        <h2 style="border:0; box-shadow:none; position:absolute; top:15%; left:28%">Inferenz Krankheitsparameter</h2>
+    </div>
+    
+    <div style="position:absolute; top:70%; left:20%; width:60%; height:20%;  text-align:left; border:3px; border-style:solid; border-color:#708090; padding: 0.2em;">
+        <img src="./sources/icon_part3.svg" height=90%  style="border:0; box-shadow:none; position:absolute; top:0%;left:2%" >
+        <h2 style="border:0; box-shadow:none; position:absolute; top:15%; left:28%">Simulation stochastischer Krankheitsausbreitung</h2>
+    </div>
+</section>
+
+<!-- ############################################################################### -->
+<!-- Part 2: Inferenz -->
+<section style="min-height:1080px">
+    <img src="./sources/icon_part2.svg" height=12%  style="border:0; box-shadow:none; position:absolute; top:1%;right:1%" >
+    <h3>Parameterinferenz für deterministische Modelle</h3>
+
+    <div data-markdown style="position:absolute; top:20%; left:10%; width:60%; text-align:left">
+    <script type="text/template">
+        Was wir lernen werden 
+
+        * Einen Einblick in Bayesian inference. <!-- .element: class="fragment fade-in" data-fragment-index="2" -->
+        * Anwendung um COVID-19 Fallzahlen (Daten) mit einfachem Modell zu beschreiben, die Parameter inklusive Ungenauigkeit zu inferieren, und diese Ungenauigkeit in mögliche Szenarien zu propagieren. <!-- .element: class="fragment fade-in" data-fragment-index="3" -->
+    </script>
+    </div>
+      <div style="position:absolute; top:30%; left:70%; width:30%">
+          <img src="./sources/covid/germany.png" width=100% style="position:relative; top:8%; left:2%; width:90%; border:0; box-shadow:none; background:none;" align=center >
+          <img id="person02" src="./sources/covid/person_black.png" width=100% style="position:absolute; top:30%; left:25%; width:5%; border:0; box-shadow:none; background:none;" align=center >
+          <img id="person05" src="./sources/covid/person_black.png" width=100% style="position:absolute; top:28%; left:35%; width:5%; border:0; box-shadow:none; background:none;" align=center >
+          <img id="person06" src="./sources/covid/person_black.png" width=100% style="position:absolute; top:40%; left:81%; width:5%; border:0; box-shadow:none; background:none;" align=center >
+          <img id="person08" src="./sources/covid/person_black.png" width=100% style="position:absolute; top:70%; left:51%; width:5%; border:0; box-shadow:none; background:none;" align=center >
+          <img id="person09" src="./sources/covid/person_black.png" width=100% style="position:absolute; top:50%; left:55%; width:5%; border:0; box-shadow:none; background:none;" align=center >
+          <img id="person10" src="./sources/covid/person_black.png" width=100% style="position:absolute; top:60%; left:34%; width:5%; border:0; box-shadow:none; background:none;" align=center >
+          <img id="person11" src="./sources/covid/person_black.png" width=100% style="position:absolute; top:80%; left:37%; width:5%; border:0; box-shadow:none; background:none;" align=center >
+          <img id="person03" src="./sources/covid/person_red.png"   width=100% style="position:absolute; top:37%; left:50%; width:5%; border:0; box-shadow:none; background:none;" align=center >
+          <img id="person07" src="./sources/covid/person_red.png"   width=100% style="position:absolute; top:50%; left:30%; width:5%; border:0; box-shadow:none; background:none;" align=center >
+          <img id="person04" src="./sources/covid/person_green.png" width=100% style="position:absolute; top:47%; left:65%; width:5%; border:0; box-shadow:none; background:none;" align=center >
+          <img id="person01" src="./sources/covid/person_red.png"   width=100% style="position:absolute; top:25%; left:74%; width:5%; border:0; box-shadow:none; background:none;" align=center >
+          <img id="person12" src="./sources/covid/person_red.png"   width=100% style="position:absolute; top:85%; left:54%; width:5%; border:0; box-shadow:none; background:none;" align=center >
+      </div>
+    
+</section>
+
+<!-- Part 2: Inferenz -->
+<section style="min-height:1080px">
+    <img src="./sources/icon_part2.svg" height=12%  style="border:0; box-shadow:none; position:absolute; top:1%;right:1%" >
+    <h3>Inference: Was wurde für COVID-19 gemacht?</h3>
+    
+    <div style="position:absolute; top:12%; left: 1%; width:55%; text-align:left" class="fragment fade-in" data-fragment-index="0" data-markdown>
+      <script type="text/template">
+        Sehr sehr viel! 
+       
+        Ernsthaft, die Literatur is förmlich explodiert. 
+
+        * Inferenz epidemiologischer Parameter <!-- .element: class="fragment fade-in" data-fragment-index="1" -->
+        * Wirkung von nicht-pharmazeutischen Maßnahmen <!-- .element: class="fragment fade-in" data-fragment-index="2" -->
+        *  ... in Deutschland <!-- .element: class="fragment fade-in" data-fragment-index="2" -->
+        *  ... in Europa <!-- .element: class="fragment fade-in" data-fragment-index="3" -->
+        *  ... in Japan (Schulen) <!-- .element: class="fragment fade-in" data-fragment-index="4" -->
+        * Person-to-Person spreading mit phylogenetischer Analyse<!-- .element: class="fragment fade-in" data-fragment-index="5" -->
+      </script>
+    </div>
+
+    <span class="fragment fade-in-then-out" data-fragment-index="1">
+        <img src="./sources/covid/2020_li_science_fig1.png" width=45% style="position:absolute; left:55%; top:25%; border:0; box-shadow:none; background:none;" align=center >
+    </span>
+    <span class="fragment fade-in-then-out" data-fragment-index="2">
+        <img src="./sources/covid/2020_dehning_science_figSummary.png" width=45% style="position:absolute; left:55%; top:25%; border:0; box-shadow:none; background:none;" align=center >
+    </span>
+    <span class="fragment fade-in-then-out" data-fragment-index="3">
+        <img src="./sources/covid/2020_flaxman_nature_Fig1_HTML.webp" width=38% style="position:absolute; left:55%; top:10%; border:0; box-shadow:none; background:none;" align=center >
+    </span>
+    <span class="fragment fade-in-then-out" data-fragment-index="4">
+        <img src="./sources/covid/2020_iwata_schoolJapan_1-s2.0-S1201971220305981-gr1.jpg" width=45% style="position:absolute; left:55%; top:25%;border:0; box-shadow:none; background:none;" align=center >
+    </span>
+    <span class="fragment fade-in-then-out" data-fragment-index="5">
+        <img src="./sources/covid/2020_wang_nature-communication_Fig1_HTML.webp" width=45% style="position:absolute; left:55%; top:25%;clip-path:inset(0% 0% 60% 0%);border:0; box-shadow:none; background:none;" align=center >
+    </span>
+
+    <div style="position:absolute; bottom:1%; left:1.0%; width=98%; text-align:left">
+        <small>
+        <br>
+        <span class="fragment fade-in" data-fragment-index="5">Wang et al., Nat. Commun. (2020)</span><br>
+        <span class="fragment fade-in" data-fragment-index="4">Iwata et al., Int. J. Infect. Dis. (2020)</span><br>
+        <span class="fragment fade-in" data-fragment-index="3">Flaxman et al., Nature (2020)</span><br>
+        <span class="fragment fade-in" data-fragment-index="2">Dehning et al., Science (2020)</span><br>
+        <span class="fragment fade-in" data-fragment-index="1">Li et al., Science (2020)</span><br>
+        </small>
+    </div>
+</section>
+
+<!-- ############################################################################### -->
+<section style="min-height:1080px">
+    <img src="./sources/icon_part2.svg" height=12%  style="border:0; box-shadow:none; position:absolute; top:1%;right:1%" >
+    <h3>Inference: Ein einfaches mathematisches Modell</h3>
+    <span class="fragment fade-out" data-fragment-index="10">
+        <img src="./sources/covid/germany.png" width=100% style="position:absolute; top:08%; left:32%; width:36%; border:0; box-shadow:none; background:none;" align=center >
+    </span>
+    <span class="fragment fade-out" data-fragment-index="10">
+    <span class="fragment fade-in" data-fragment-index="1">
+        <img id="person01" src="./sources/covid/person_black.png" width=100% style="position:absolute; top:28%; left:55%; width:2%; border:0; box-shadow:none; background:none;" align=center >
+        <img id="person02" src="./sources/covid/person_black.png" width=100% style="position:absolute; top:30%; left:40%; width:2%; border:0; box-shadow:none; background:none;" align=center >
+        <img id="person03" src="./sources/covid/person_black.png" width=100% style="position:absolute; top:40%; left:50%; width:2%; border:0; box-shadow:none; background:none;" align=center >
+        <img id="person04" src="./sources/covid/person_black.png" width=100% style="position:absolute; top:50%; left:59%; width:2%; border:0; box-shadow:none; background:none;" align=center >
+        <img id="person05" src="./sources/covid/person_black.png" width=100% style="position:absolute; top:30%; left:42%; width:2%; border:0; box-shadow:none; background:none;" align=center >
+        <img id="person06" src="./sources/covid/person_black.png" width=100% style="position:absolute; top:40%; left:61%; width:2%; border:0; box-shadow:none; background:none;" align=center >
+        <img id="person07" src="./sources/covid/person_black.png" width=100% style="position:absolute; top:50%; left:40%; width:2%; border:0; box-shadow:none; background:none;" align=center >
+        <img id="person08" src="./sources/covid/person_black.png" width=100% style="position:absolute; top:70%; left:51%; width:2%; border:0; box-shadow:none; background:none;" align=center >
+        <img id="person09" src="./sources/covid/person_black.png" width=100% style="position:absolute; top:50%; left:55%; width:2%; border:0; box-shadow:none; background:none;" align=center >
+        <img id="person10" src="./sources/covid/person_black.png" width=100% style="position:absolute; top:60%; left:44%; width:2%; border:0; box-shadow:none; background:none;" align=center >
+        <img id="person11" src="./sources/covid/person_black.png" width=100% style="position:absolute; top:80%; left:45%; width:2%; border:0; box-shadow:none; background:none;" align=center >
+        <img id="person12" src="./sources/covid/person_black.png" width=100% style="position:absolute; top:80%; left:50%; width:2%; border:0; box-shadow:none; background:none;" align=center >
+    </span>
+    <span class="fragment fade-in" data-fragment-index="2">
+        <img id="person04" src="./sources/covid/person_red.png" width=100% style="position:absolute; top:50%; left:59%; width:2%; border:0; box-shadow:none; background:none;" align=center >
+    </span>
+    <span class="fragment fade-in" data-fragment-index="3">
+        <img id="person03" src="./sources/covid/person_red.png" width=100% style="position:absolute; top:40%; left:50%; width:2%; border:0; box-shadow:none; background:none;" align=center >
+        <img id="person07" src="./sources/covid/person_red.png" width=100% style="position:absolute; top:50%; left:40%; width:2%; border:0; box-shadow:none; background:none;" align=center >
+    </span>
+    <span class="fragment fade-in" data-fragment-index="4">
+        <img id="person04" src="./sources/covid/person_green.png" width=100% style="position:absolute; top:50%; left:59%; width:2%; border:0; box-shadow:none; background:none;" align=center >
+
+        <img id="person01" src="./sources/covid/person_red.png" width=100% style="position:absolute; top:28%; left:55%; width:2%; border:0; box-shadow:none; background:none;" align=center >
+        <img id="person12" src="./sources/covid/person_red.png" width=100% style="position:absolute; top:80%; left:50%; width:2%; border:0; box-shadow:none; background:none;" align=center >
+    </span>
+    </span>
+    <span class="fragment fade-in" data-fragment-index="10">
+        <img id="person05" src="./sources/covid/person_black.png" width=100% style="position:absolute; top:20%; left:25%; width:2%; border:0; box-shadow:none; background:none;" align=center >
+        <img id="person06" src="./sources/covid/person_black.png" width=100% style="position:absolute; top:20%; left:27%; width:2%; border:0; box-shadow:none; background:none;" align=center >
+        <img id="person02" src="./sources/covid/person_black.png" width=100% style="position:absolute; top:20%; left:29%; width:2%; border:0; box-shadow:none; background:none;" align=center >
+        <img id="person08" src="./sources/covid/person_black.png" width=100% style="position:absolute; top:27%; left:25%; width:2%; border:0; box-shadow:none; background:none;" align=center >
+        <img id="person09" src="./sources/covid/person_black.png" width=100% style="position:absolute; top:27%; left:27%; width:2%; border:0; box-shadow:none; background:none;" align=center >
+        <img id="person10" src="./sources/covid/person_black.png" width=100% style="position:absolute; top:27%; left:29%; width:2%; border:0; box-shadow:none; background:none;" align=center >
+        <img id="person11" src="./sources/covid/person_black.png" width=100% style="position:absolute; top:34%; left:25%; width:2%; border:0; box-shadow:none; background:none;" align=center >
+        <img id="person07" src="./sources/covid/person_red.png"   width=100% style="position:absolute; top:20%; left:50%; width:2%; border:0; box-shadow:none; background:none;" align=center >
+        <img id="person12" src="./sources/covid/person_red.png"   width=100% style="position:absolute; top:20%; left:52%; width:2%; border:0; box-shadow:none; background:none;" align=center >
+        <img id="person01" src="./sources/covid/person_red.png"   width=100% style="position:absolute; top:20%; left:54%; width:2%; border:0; box-shadow:none; background:none;" align=center >
+        <img id="person03" src="./sources/covid/person_red.png"   width=100% style="position:absolute; top:27%; left:50%; width:2%; border:0; box-shadow:none; background:none;" align=center >
+        <img id="person04" src="./sources/covid/person_green.png" width=100% style="position:absolute; top:20%; left:75%; width:2%; border:0; box-shadow:none; background:none;" align=center >
+    </span>
+    <span class="fragment fade-in" data-fragment-index="12">
+        <div style="position:absolute; left:20%; top:08; width:15%; height:5%; text-align:center; padding-top:22%; border:solid">
+            <b>S</b>usceptible
+        </div>
+    </span>
+    <span class="fragment fade-in" data-fragment-index="13">
+        <div style="position:absolute; left:45%; top:08%; width:15%; height:5%; text-align:center; padding-top:22%; border:solid">
+            <b>I</b>nfected
+        </div>
+    </span>
+    <span class="fragment fade-in" data-fragment-index="14">
+        <div style="position:absolute; left:70%; top:08%; width:15%; height:5%; text-align:center; padding-top:22%; border:solid">
+            <b>R</b>ecovered
+        </div>
+    </span>
+    <span class="fragment fade-in" data-fragment-index="15">
+        <!-- include the rates from left to right -->
+        <svg viewBox="0 0 350 100" style="position:absolute; top:5%; left:05%; width:90%;">
+          <defs>
+            <marker id="arrowhead" markerWidth="10" markerHeight="7" 
+            refX="0" refY="3.5" orient="auto">
+              <polygon points="0 0, 10 3.5, 0 7" />
+            </marker>
+          </defs>
+          <line x1="110" y1="50" x2="160" y2="50" stroke="#000" 
+          stroke-width="1" marker-end="url(#arrowhead)" />
+          <line x1="207" y1="50" x2="258" y2="50" stroke="#000" 
+          stroke-width="1" marker-end="url(#arrowhead)" />
+        </svg>
+        <p  style="position:absolute; top:21%; left:35%; width:10%;"> $\lambda$ </p>
+        <p  style="position:absolute; top:27%; left:35%; width:10%;"> spreading rate</p>
+        <p  style="position:absolute; top:21%; left:60%; width:10%;"> $\mu$ </p>
+        <p  style="position:absolute; top:27%; left:60%; width:10%;"> recovery rate</p>
+    </span>
+    <div class="fragment fade-in" data-fragment-index="20" style="position:absolute; left:2%; top:56%; width:50%; text-align:left;">
+        Differentialgleichung:
+        $$
+        \frac{dS}{dt} = -\lambda\frac{S}{N} I\phantom{+\mu I}\\
+        \frac{dI}{dt} = \left(\lambda\frac{S}{N} -\mu \right)I\\
+        \frac{dR}{dt} = \phantom{+}\mu I \phantom{-\lambda\frac{S}{N} I}
+        $$
+    </div>
+    <span class="fragment fade-in-then-out" data-fragment-index="30">
+        <img src="./sources/weblogos/onlineTED.svg" width=40%  style="border:0; box-shadow:none; position:absolute; top:70%; left:60%">
+    </span>
+</section>
+
+<!-- ############################################################################### -->
+<section style="min-height:1080px">
+    <img src="./sources/icon_part2.svg" height=12%  style="border:0; box-shadow:none; position:absolute; top:1%;right:1%" >
+    <h3>Inference: Bayesian inference mit SIR</h3>
+
+    <div style="position:absolute; left:5%; top:10%; width:90%; text-align:left;">
+        Ziel: Wir wollen Parameter unseres Modells finden, damit die Lösung der Gleichungen die Daten gut beschreiben.
+    </div>
+
+        <div style="position:absolute; left:0%; top:20%; width:50%;">
+            <img src="./sources/custom/inference_example_SIR_data.png" width=100% style="border:0; box-shadow:none; background:none;" align=center >
+            $\frac{dS}{dt} = -\lambda\frac{S}{N} I\phantom{+\mu I}$ <br>
+            $\frac{dI}{dt} = \left(\lambda\frac{S}{N} -\mu \right)I$
+        </div>
+    <span class="fragment fade-in" data-fragment-index="10">
+        <div style="position:absolute; left:0%; top:20%; width:50%;">
+            <img src="./sources/custom/inference_example_SIR_bestfit.png" width=100% style="border:0; box-shadow:none; background:none;" align=center >
+        </div>
+    </span>
+    <div style="position:absolute; left:50%; top:20%; width:55%;text-align:left">
+        <span class="fragment fade-in" data-fragment-index="2">
+            Es sei $N=10^5$, $R(0)=0$, $I(0)=I_0$, und $S(0)= N-I_0$.<br><br>
+            mit den freien Parmetern $\lambda, \mu, I_0$.<br><br>
+        </span>
+        <span class="fragment fade-in" data-fragment-index="3">
+            Numerische Integration gibt uns $I(t)$
+            <img src="./sources/custom/inference_example_numeric_integration.png" width=80% style="clip-path:inset(0% 0% 35% 0%);border:0; box-shadow:none; background:none;" align=center >
+        </span>
+    </div>
+    </span>
+</section>
+
+<!-- ############################################################################### -->
+<section style="min-height:1080px">
+    <img src="./sources/icon_part2.svg" height=12%  style="border:0; box-shadow:none; position:absolute; top:1%;right:1%" >
+    <h3>Inference: Bayesian inference mit SIR</h3>
+
+    <div style="position:absolute; left:5%; top:10%; width:90%; text-align:left;">
+        Idee: Markov chain aus der Verteilung der wahrscheinlichsten Parameter.
+    </div>
+
+    <span class="fragment fade-in" data-fragment-index="1">
+        <div style="position:absolute; left:0%; top:15%; width:30%;">
+            <img src="./sources/custom/inference_example_SIR_data.png" width=100% style="border:0; box-shadow:none; background:none;" align=center >
+            $\frac{dS}{dt} = -\lambda\frac{S}{N} I\phantom{+\mu I}$ <br>
+            $\frac{dI}{dt} = \left(\lambda\frac{S}{N} -\mu \right)I$<br>
+            <br>$\theta = (\lambda, \mu, I_0)$
+        </div>
+    </span>
+    <span class="fragment fade-in" data-fragment-index="22">
+        <div style="position:absolute; left:0%; top:15%; width:30%;">
+            <img src="./sources/custom/inference_example_SIR_bestfit.png" width=100% style="border:0; box-shadow:none; background:none;" align=center >
+        </div>
+    </span>
+    <div style="position:absolute; left:30%; top:20%; width:70%;text-align:left">
+        <span class="fragment fade-out" data-fragment-index="20">
+        <span class="fragment fade-in" data-fragment-index="2">
+            Satz von Bayes: $P(\text{Parameter}|\text{Daten}) = \frac{P(\text{Daten}|\text{Parameter})P(\text{Parameter})}{P(\text{Daten})} $
+        </span>
+        <br><br>
+        <span class="fragment fade-in" data-fragment-index="11">
+            Prior $P(\text{Parameter})$: Spezifiziert unser Wissen<br>
+            $\phantom{Prior P(Parameter)}I_0 \in [1,100]$<br>
+            $\phantom{Prior P(Parameter)}\lambda\phantom{_0} \in [0,1]$ <br>    
+            $\phantom{Prior P(Parameter)}\mu\phantom{_0} \in [0,1]$
+        </span>
+        <br><br>
+        <span class="fragment fade-in" data-fragment-index="12">
+            Likelihood $P(\text{Daten}|\text{Parameter})$:<br>
+            Spezifiziert wie gut Modell die Daten beschreibt<br>
+            z.B.  $P(\text{Daten}|\text{Parameter}) = e^{-\sum_t \left(I_\mathrm{model}(t)-I_\mathrm{data}(t)\right)^2/2/I_\mathrm{data}(t)}$<br>
+        </span>
+        <br>
+        <span class="fragment fade-in" data-fragment-index="13">
+            Posterior $P(\text{Parameter}|\text{Daten})$: <br>
+            Beschreibt die Wahrscheinlichkeit der Modellparameter falls das Modell richtig ist.
+        </span>
+        </span>
+    </div>
+
+    <div style="position:absolute; left:30%; top:20%; width:70%;text-align:left">
+        <span class="fragment fade-in" data-fragment-index="20">
+            Monte Carlo Wahrscheinlichkeitsverteilung :<br>
+            $P(\theta|\text{Daten}) \propto  P(\text{Daten}|\theta)P(\theta) = W(\theta)\Omega(\theta)$
+        </span>
+        <br><br>
+        <span class="fragment fade-in" data-fragment-index="21">
+            Monte Carlo update:<br>
+            Vorschlag $\lambda \to \lambda^\prime$, $\mu \to \mu^\prime$, $I_0 \to I_0^\prime$ wird akzeptiert mit <br>
+            Wahrscheinlichkeit $\frac{P(\text{Daten}|\theta^\prime)P(\theta^\prime)}{P(\text{Daten}|\theta)P(\theta)}$
+        </span>
+
+        <br><br>
+        <span class="fragment fade-in" data-fragment-index="22">
+            Unser einfaches Beispiel:<br>
+            Gleichmäßige prior $\lambda\phantom{_0} \in [0,1]$, $\mu\phantom{_0} \in [0,1]$, $I_0 \in [1,100]$ <br>
+            Least square likelihood: $P(\text{Daten}|\theta) = e^{-\sum_t \left(I_\mathrm{model}(t)-I_\mathrm{data}(t)\right)^2/2/I_\mathrm{data}(t)}$<br>
+            $p(\theta\to\theta^\prime) = \exp\left\{\ln P(\text{Daten}|\theta^\prime)-\ln P(\text{Daten}|\theta)\right\}$
+        </span>
+    </div>
+
+    <span class="fragment fade-in-then-out" data-fragment-index="22">
+        <div style="position:absolute; left:0%; top:48%; width:30%;">
+            <img src="./sources/custom/inference_example_SIR_MC.png" width=100% style="border:0; box-shadow:none; background:none;" align=center >
+        </div>
+    </span>
+    <span class="fragment fade-in-then-out" data-fragment-index="23">
+        <div style="position:absolute; left:20%; top:0%; width:60%;background:white">
+            <img src="./sources/custom/inference_example_SIR_MC.png" width=100% style="border:0; box-shadow:none; background:none;" align=center >
+        </div>
+        <div  style="position:absolute; left:80%; top:0%; width:20%;background:white; text-align:left">
+            Modellparameter:<br>
+            <br>
+            $\mu=1/7=0.142857...$
+            <br><br>
+            <br><br>
+            <br>
+            $\lambda=2/7=0.285714...$
+            <br><br>
+            <br><br>
+            <br>
+            $I_0=10$
+            <br><br>
+            <br><br>
+            <br><br>
+            <br>
+        </div>
+    </span>
+    <span class="fragment fade-in" data-fragment-index="24">
+        <div style="position:absolute; left:0%; top:48%; width:30%;">
+            <img src="./sources/custom/inference_example_SIR_MC.png" width=100% style="border:0; box-shadow:none; background:none;" align=center >
+        </div>
+    </span>
+    <span class="fragment fade-in" data-fragment-index="25">
+        <div style="position:absolute; left:28%; top:5%; width:50%;">
+            <img src="./sources/custom/inference_example_MC_implementation.png" width=100% style="border:0; box-shadow:none; background:none;" align=center >
+        </div>
+    </span>
+
+
+    <span class="fragment fade-in-then-out" data-fragment-index="3">
+    <div style="position:absolute; left:30%; top:40%; width:70%;text-align:left">
+        Beweis: 
+        $$
+            P(A|B) P(B) = P(A\cap B) = P(B|A) P(A)
+        $$
+    </div>
+    <img src="./sources/general/wikipedia_venn0001.svg" width=30% style="border:0; box-shadow:none; position:absolute; top:55%; left:50%">
+    </span>
+</section>
+
+<!-- ############################################################################### -->
+<section style="min-height:1080px">
+    <img src="./sources/icon_part2.svg" height=12%  style="border:0; box-shadow:none; position:absolute; top:1%;right:1%" >
+    <h3>Inference: Gruppenarbeit</h3>
+
+    <span class="fragment fade-out" data-fragment-index="10">
+        <div style="position:absolute; left:25%; top:10%; width:50%; text-align:left;">
+            Differentialgleichung:
+            $$
+            \frac{dS}{dt} = -\lambda\frac{S}{N} I\phantom{+\mu I}\\
+            \frac{dI}{dt} = \left(\lambda\frac{S}{N} -\mu \right)I\\
+            \frac{dR}{dt} = \phantom{+}\mu I \phantom{-\lambda\frac{S}{N} I}
+            $$
+        </div>
+
+        <div style="position:absolute; top:60%; left:5%; width:90%; text-align:left">
+            <span class="fragment fade-in" data-fragment-index="1">
+            1. Wie vereinfachen sich die SIR Gleichungen für den anfänglichen Krankheitsausbruch in einer großen Population ($N\gg S$)? 
+            </span>
+            <br><br>
+            <span class="fragment fade-in" data-fragment-index="2">
+            2. Welche Funktion beschreibt den anfänglichen Krankheitsausbruch wenn $dI \propto I$ ?
+            </span>
+            <br><br>
+            <span class="fragment fade-in" data-fragment-index="3">
+                3. Skizziert die Verteilung $P(\lambda, \mu|\text{Daten})$ für den anfänglichen Krankheisausbruch.
+            </span>
+        </script>
+        </div>
+    </span>
+    <span class="fragment fade-in" data-fragment-index="10">
+        <div style="position:absolute; left:20%; top:10%; width:60%">
+            <img src="./sources/covid/2020_dehning_science_fig1.png" width=100% style="border:0; box-shadow:none; background:none;" align=center >
+        </div>
+        <div style="position:absolute; bottom:1%; left:1.0%; width=98%; text-align:left">
+            <small>
+            <br>Dehning et al. Science (2020)<br>
+            </small>
+        </div>
+    </span>
+</section>
+
+
+<!-- ############################################################################### -->
+<section style="min-height:1080px">
+    <img src="./sources/icon_part2.svg" height=12%  style="border:0; box-shadow:none; position:absolute; top:1%;right:1%" >
+    <h3>Inference: Erweitertes Modell für COVID-19 Ausbruch in Deutschland</h3>
+    <img id="person05" src="./sources/covid/person_black.png" width=100% style="position:absolute; top:20%; left:25%; width:2%; border:0; box-shadow:none; background:none;" align=center >
+    <img id="person06" src="./sources/covid/person_black.png" width=100% style="position:absolute; top:20%; left:27%; width:2%; border:0; box-shadow:none; background:none;" align=center >
+    <img id="person02" src="./sources/covid/person_black.png" width=100% style="position:absolute; top:20%; left:29%; width:2%; border:0; box-shadow:none; background:none;" align=center >
+    <img id="person08" src="./sources/covid/person_black.png" width=100% style="position:absolute; top:27%; left:25%; width:2%; border:0; box-shadow:none; background:none;" align=center >
+    <img id="person09" src="./sources/covid/person_black.png" width=100% style="position:absolute; top:27%; left:27%; width:2%; border:0; box-shadow:none; background:none;" align=center >
+    <img id="person10" src="./sources/covid/person_black.png" width=100% style="position:absolute; top:27%; left:29%; width:2%; border:0; box-shadow:none; background:none;" align=center >
+    <img id="person11" src="./sources/covid/person_black.png" width=100% style="position:absolute; top:34%; left:25%; width:2%; border:0; box-shadow:none; background:none;" align=center >
+    <img id="person07" src="./sources/covid/person_red.png"   width=100% style="position:absolute; top:20%; left:50%; width:2%; border:0; box-shadow:none; background:none;" align=center >
+    <img id="person12" src="./sources/covid/person_red.png"   width=100% style="position:absolute; top:20%; left:52%; width:2%; border:0; box-shadow:none; background:none;" align=center >
+    <img id="person01" src="./sources/covid/person_red.png"   width=100% style="position:absolute; top:20%; left:54%; width:2%; border:0; box-shadow:none; background:none;" align=center >
+    <img id="person03" src="./sources/covid/person_red.png"   width=100% style="position:absolute; top:27%; left:50%; width:2%; border:0; box-shadow:none; background:none;" align=center >
+    <img id="person04" src="./sources/covid/person_green.png" width=100% style="position:absolute; top:20%; left:75%; width:2%; border:0; box-shadow:none; background:none;" align=center >
+    <div style="position:absolute; left:20%; top:08; width:15%; height:5%; text-align:center; padding-top:22%; border:solid">
+        <b>S</b>usceptible
+    </div>
+    <div style="position:absolute; left:45%; top:08%; width:15%; height:5%; text-align:center; padding-top:22%; border:solid">
+        <b>I</b>nfected
+    </div>
+    <div style="position:absolute; left:70%; top:08%; width:15%; height:5%; text-align:center; padding-top:22%; border:solid">
+        <b>R</b>ecovered
+    </div>
+    <!-- include the rates from left to right -->
+    <svg viewBox="0 0 350 100" style="position:absolute; top:5%; left:05%; width:90%;">
+      <defs>
+        <marker id="arrowhead2" markerWidth="10" markerHeight="7" 
+        refX="0" refY="3.5" orient="auto">
+          <polygon points="0 0, 10 3.5, 0 7" />
+        </marker>
+      </defs>
+      <line x1="110" y1="50" x2="160" y2="50" stroke="#000" 
+      stroke-width="1" marker-end="url(#arrowhead2)" />
+      <line x1="207" y1="50" x2="258" y2="50" stroke="#000" 
+      stroke-width="1" marker-end="url(#arrowhead2)" />
+    </svg>
+    <p  style="position:absolute; top:21%; left:35%; width:10%;"> $\lambda$ </p>
+    <p  style="position:absolute; top:27%; left:35%; width:10%;"> spreading rate</p>
+    <p  style="position:absolute; top:21%; left:60%; width:10%;"> $\mu$ </p>
+    <p  style="position:absolute; top:27%; left:60%; width:10%;"> recovery rate</p>
+    <div style="position:absolute; left:0%; top:55%; width:48%; text-align:left;">
+        $$
+        S_t - S_{t-1} = -\lambda\frac{S_{t-1}}{N} I_{t-1}\Delta t\phantom{++\mu} = -I_t^\mathrm{new}\phantom{+R_t^\mathrm{new}}\\
+        R_t - R_{t-1} = \phantom{+}\mu I_{t-1}\Delta t \phantom{++\lambda\frac{S_{t-1}}{N}} = R_t^\mathrm{new}\phantom{ -I_t^\mathrm{new}}\\
+        I_t - I_{t-1} = \left(\lambda\frac{S_{t-1}}{N} -\mu \right)I_{t-1}\Delta t = I_t^\mathrm{new} - R_t^\mathrm{new}
+        $$
+    </div>
+    <span class="fragment fade-in-then-out" data-fragment-index="1">
+        <img src="./sources/weblogos/onlineTED.svg" width=40%  style="border:0; box-shadow:none; position:absolute; top:70%; left:60%">
+    </span>
+    <span class="fragment fade-in" data-fragment-index="10">
+        <div style="position:absolute; left:55%; top:60%; width:40%; text-align:left;">
+            Delay $D$:<br> $C_t = I^\mathrm{new}_{t-D}$
+            <br><br>
+            <span class="fragment fade-in" data-fragment-index="11">
+                Weekday modulation:<br>
+                $C_t  = I^\mathrm{new}_{t-D}\left(1-f(t)\right)$
+                $f(t) = (1-f_w)\left(1-\left|\sin\left(\frac{pi}{7}t-\frac{1}{2}\Phi_w\right)\right|\right)$
+            </span>
+        </div>
+    </span>
+    <div style="position:absolute; bottom:1%; left:1.0%; width=98%; text-align:left">
+        <small>
+        <br>Dehning et al. Science (2020)<br>
+        </small>
+    </div>
+</section>
+
+<!-- ############################################################################### -->
+<section style="min-height:1080px">
+    <img src="./sources/icon_part2.svg" height=12%  style="border:0; box-shadow:none; position:absolute; top:1%;right:1%" >
+    <h3>Inference: Change points in COVID-19 Ausbruch </h3>
+    <div class="fragment fade-in" data-fragment-index="1" style="position:absolute; top:12%; left:5%; width:80%; text-align:left">
+        Idee:<br> 
+        Wir modellieren den Einfluss von nicht-pharmazeutischen Maßnahmen als change points in der spreading rate
+    </div>
+
+    <div class="fragment fade-in" data-fragment-index="1" style="position:absolute; top:30%; left:15%; width:160%">
+        <img src="./sources/covid/2020_dehning_science_fig2.png" width=100% style="clip-path:inset(0% 62% 79% 0%);border:0; box-shadow:none; background:none;" align=center >
+    </div>
+
+    <div class="fragment fade-in" data-fragment-index="3" style="position:absolute; top:60%; left:5%; width:90%; text-align:left" data-markdown>
+        Maßnahmen die wir berücksichtig hatten:
+
+        * March $\\;$9, 2020: Absage von Großveranstaltungen mit mehr als 1000 Teilnehmer.  
+
+        * March 16, 2020: Schließung von Schulen, Kinderbetreuung und der Mehrheit der Geschäfte. 
+
+        * March 23, 2020: Kontaktsperre und Schließung von allen nicht-relevanten Geschäften. 
+    </div>
+    
+    <div style="position:absolute; bottom:1%; left:1.0%; width=98%; text-align:left">
+        <small>
+        <br>Dehning et al. Science (2020)<br>
+        </small>
+    </div>
+</section>
+
+
+
+
+<!-- ############################################################################### -->
+<section style="min-height:1080px">
+    <img src="./sources/icon_part2.svg" height=12%  style="border:0; box-shadow:none; position:absolute; top:1%;right:1%" >
+    <h3>Inference: Wie gut wirken nicht-pharmazeutische Maßnahmen?</h3>
+    
+    <div class="fragment fade-in" data-fragment-index="1" style="position:absolute; top:5%; left:0%; width:70%">
+        <img src="./sources/covid/2020_dehning_science_fig3.png" width=90% style="border:0; box-shadow:none; background:none;" align=center >
+    </div>
+
+    <small class="fragment fade-in" data-fragment-index="10" style="position:absolute; top:14%; left:70%; width:30%; text-align:left">
+        Leave-One-Out model comparison:<br>
+        Der Vergleich zwischen verschiedenen Modellen (0,1,2,3 CPs) schloss 0/1 CPs aus 
+        und favorisierte 3 CP Modell.
+    </small>
+
+    <small class="fragment fade-in" data-fragment-index="2" style="position:absolute; top:35%; left:70%; width:30%; text-align:left" data-markdown>
+        Reporting delay hat mindestens drei Beiträge:
+        * biologische Inkubationszeit (5-6 days$^1$)
+        * Verzögerung zwischen ersten Symptomen und solchen die einen Test motivieren (1-2 days)
+        * Verzögerung zwischen Test und Ergebnis (1-2 days) 
+    </small>
+
+    <small class="fragment fade-in" data-fragment-index="3" style="position:absolute; top:60%; left:70%; width:30%; text-align:left">
+        March 9, 2020:<br>
+        Absage von Großveranstaltungen mit mehr als 1000 Teilnehmer.  
+    </small>
+    
+    <small class="fragment fade-in" data-fragment-index="4" style="position:absolute; top:71%; left:70%; width:30%; text-align:left">
+        March 16, 2020:<br>
+        Schließung von Schulen, Kinderbetreuung und der Mehrheit der Geschäfte. 
+    </small>
+    
+    <small class="fragment fade-in" data-fragment-index="5" style="position:absolute; top:83%; left:70%; width:30%; text-align:left">
+        March 23, 2020:<br>
+        Kontaktsperre und Schließung von allen nicht-relevanten Geschäften. 
+    </small>
+    
+    <div style="position:absolute; bottom:1%; left:72%; width=28%; text-align:left">
+      <small>
+          <br><span class="fragment fade-in" data-fragment-index="2">$^1$Lauer et al. Ann Intern Med (2020)</span>
+      </small>
+    </div>
+    <div style="position:absolute; bottom:1%; left:1.0%; width=98%; text-align:left">
+        <small>
+        <br>Dehning et al. Science (2020)<br>
+        </small>
+    </div>
+</section>
+
+<!-- ############################################################################### -->
+<section style="min-height:1080px">
+    <img src="./sources/icon_part2.svg" height=12%  style="border:0; box-shadow:none; position:absolute; top:1%;right:1%" >
+    <h3>Inference: Prognose</h3>
+    <div class="fragment fade-in" data-fragment-index="3" style="position:absolute; top:20%; left:15%; width:70%">
+        <img src="./sources/covid/2020_dehning_science_figSummary.png" width=100% style="border:0; box-shadow:none; background:none;" align=center >
+    </div>
+    <div style="position:absolute; bottom:1%; left:1.0%; width=98%; text-align:left">
+        <small>
+        <br>Dehning et al. Science (2020)<br>
+        </small>
+    </div>
+</section>
+
+
+<!-- ############################################################################### -->
+<!-- ############################################################################### -->
+<section style="min-height:1080px">
+    <img src="./sources/icon_part2.svg" height=12%  style="border:0; box-shadow:none; position:absolute; top:1%;right:1%" >
+    <h3>Inference: Was haben wir gelernt?</h3>
+    <div class="fragment fade-in" data-fragment-index="2" style="position:absolute; top:14%; left:40%; width:60%; text-align:left" data-markdown>
+        <script type="text/template">
+        * Wir haben Parameter eines (erweiterten) SIR Modells mit Bayesian inference bestimmt ... <!-- .element: class="fragment fade-in" data-fragment-index="2" -->
+        * ... und gesehen, dass man diese Parameterunsicherheit auch auf mögliche Szenarien in der nahen Zukunft propagieren kann. <!-- .element: class="fragment fade-in" data-fragment-index="3" -->
+        * Alle Ergebnisse sollten innerhalb des Modellraumes interpretiert werden (hier well-mixed compartment model). <!-- .element: class="fragment fade-in" data-fragment-index="4" -->
+        </script>
+    </div>
+
+    <span class="fragment fade-in-then-out" data-fragment-index="2">
+        <img src="./sources/covid/germany.png" width=100% style="position:absolute; top:6%; left:2%; width:36%; border:0; box-shadow:none; background:none;" align=center >
+        <img id="person02" src="./sources/covid/person_black.png" width=100% style="position:absolute; top:30%; left:10%; width:2%; border:0; box-shadow:none; background:none;" align=center >
+        <img id="person05" src="./sources/covid/person_black.png" width=100% style="position:absolute; top:30%; left:12%; width:2%; border:0; box-shadow:none; background:none;" align=center >
+        <img id="person06" src="./sources/covid/person_black.png" width=100% style="position:absolute; top:40%; left:31%; width:2%; border:0; box-shadow:none; background:none;" align=center >
+        <img id="person08" src="./sources/covid/person_black.png" width=100% style="position:absolute; top:70%; left:21%; width:2%; border:0; box-shadow:none; background:none;" align=center >
+        <img id="person09" src="./sources/covid/person_black.png" width=100% style="position:absolute; top:50%; left:25%; width:2%; border:0; box-shadow:none; background:none;" align=center >
+        <img id="person10" src="./sources/covid/person_black.png" width=100% style="position:absolute; top:60%; left:14%; width:2%; border:0; box-shadow:none; background:none;" align=center >
+        <img id="person11" src="./sources/covid/person_black.png" width=100% style="position:absolute; top:80%; left:15%; width:2%; border:0; box-shadow:none; background:none;" align=center >
+        <img id="person03" src="./sources/covid/person_red.png"   width=100% style="position:absolute; top:40%; left:20%; width:2%; border:0; box-shadow:none; background:none;" align=center >
+        <img id="person07" src="./sources/covid/person_red.png"   width=100% style="position:absolute; top:50%; left:10%; width:2%; border:0; box-shadow:none; background:none;" align=center >
+        <img id="person04" src="./sources/covid/person_green.png" width=100% style="position:absolute; top:50%; left:29%; width:2%; border:0; box-shadow:none; background:none;" align=center >
+        <img id="person01" src="./sources/covid/person_red.png"   width=100% style="position:absolute; top:28%; left:25%; width:2%; border:0; box-shadow:none; background:none;" align=center >
+        <img id="person12" src="./sources/covid/person_red.png"   width=100% style="position:absolute; top:80%; left:20%; width:2%; border:0; box-shadow:none; background:none;" align=center >
+    </span>
+
+    <div class="fragment fade-in" data-fragment-index="3" style="position:absolute; top:12%; left:-3%; width:45%">
+        <img src="./sources/covid/2020_04_19_forecast.png" width=100% style="border:0; box-shadow:none; background:none;" align=center >
+    </div>
+
+    <span class="fragment fade-in" data-fragment-index="10">
+    <div style="border:0; position:absolute; top:50%;left:55%; text-align:left; width:36%">
+      <img src="./sources/collaborators/priesemann_group_2019.jpg" width=100% style="border:0; box-shadow:none; background:none;" align=left>
+    </div>
+    <div style="border:0; position:absolute; top:71%;left:78%; width:10%">
+      <img src="./sources/collaborators/michael_wilczek_2020.jpeg" width=100% style="border:0; box-shadow:none; background:none;" align=right>
+    </div>
+    <div style="position:absolute; bottom:2%; left:50%; width:50%">
+        Unser code war durchweg frei verfügbar auf github!
+    </div>
+    </span>
+
+    <span class="fragment fade-in" data-fragment-index="20">
+        <div style="border:0; position:absolute; top:10%;left:0%;width:100%; text-align:left;">
+        <img src="./sources/custom/github_priesemann_inference.png" width=100% style="border:0; box-shadow:none; background:none;" align=left>
+        </div>
+    </span>
+    
+    <div style="position:absolute; bottom:1%; left:1.0%; width=98%; text-align:left">
+        <small>
+        <br>Dehning et al. Science (2020)<br>
+        </small>
+    </div>
+</section>
+
+<!-- ############################################################################### -->
+<!-- ############################################################################### -->
+<!-- ############################################################################### -->
+<section style="min-height:1080px">
+    <div style="position:absolute; top:10%; left:20%; width:60%; height:20%;  text-align:left; border:3px; border-style:solid; border-color:#708090; padding: 0.2em;">
+        <img src="./sources/icon_part1.svg" height=90% style="border:0; box-shadow:none; position:absolute; top:0%;left:2%" >
+        <h2 style="border:0; box-shadow:none; position:absolute; top:30%; left:28%">Monte Carlo 101</h2>
+    </div>
+
+    <div style="position:absolute; top:40%; left:20%; width:60%; height:20%;  text-align:left; border:3px; border-style:solid; border-color:#708090; padding: 0.2em;">
+        <img src="./sources/icon_part2.svg" height=90%  style="border:0; box-shadow:none; position:absolute; top:0%;left:2%" >
+        <h2 style="border:0; box-shadow:none; position:absolute; top:15%; left:28%">Inferenz Krankheitsparameter</h2>
+    </div>
+    
+    <div style="position:absolute; top:70%; left:20%; width:60%; height:20%;  text-align:left; border:3px; border-style:solid; border-color:#708090; padding: 0.2em;">
+        <img src="./sources/icon_part3.svg" height=90%  style="border:0; box-shadow:none; position:absolute; top:0%;left:2%" >
+        <h2 style="border:0; box-shadow:none; position:absolute; top:15%; left:28%">Simulation stochastischer Krankheitsausbreitung</h2>
+    </div>
+</section>
+
+<!-- ############################################################################### -->
+<!-- Part 3: Simulation -->
+<section style="min-height:1080px">
+    <img src="./sources/icon_part3.svg" height=12%  style="border:0; box-shadow:none; position:absolute; top:1%;right:1%" >
+    <h3>Simulation stochastischer Krankheitsausbreitung</h3>
+
+    <div data-markdown style="position:absolute; top:20%; left:10%; width:60%; text-align:left">
+    <script type="text/template">
+        Was wir lernen werden 
+
+        * Wie kann man Kranheitsausbreitung als stochastischen Prozess simulieren? <!-- .element: class="fragment fade-in" data-fragment-index="2" -->
+        * Wie hängen stochastische Realisierungen mit deterministischer Beschreibung zusammen? <!-- .element: class="fragment fade-in" data-fragment-index="3" -->
+        * Welche Möglichkeiten bietet stochastische Beschreibung? <!-- .element: class="fragment fade-in" data-fragment-index="4" -->
+    </script>
+    </div>
+</section>
+
+<section style="min-height:1080px">
+    <img src="./sources/icon_part3.svg" height=12%  style="border:0; box-shadow:none; position:absolute; top:1%;right:1%" >
+    <h3>Simulation: SIR Modell als chemische Reaktionsgleichung</h3>
+
+    <img id="person05" src="./sources/covid/person_black.png" width=100% style="position:absolute; top:20%; left:25%; width:2%; border:0; box-shadow:none; background:none;" align=center >
+    <img id="person06" src="./sources/covid/person_black.png" width=100% style="position:absolute; top:20%; left:27%; width:2%; border:0; box-shadow:none; background:none;" align=center >
+    <img id="person02" src="./sources/covid/person_black.png" width=100% style="position:absolute; top:20%; left:29%; width:2%; border:0; box-shadow:none; background:none;" align=center >
+    <img id="person08" src="./sources/covid/person_black.png" width=100% style="position:absolute; top:27%; left:25%; width:2%; border:0; box-shadow:none; background:none;" align=center >
+    <img id="person09" src="./sources/covid/person_black.png" width=100% style="position:absolute; top:27%; left:27%; width:2%; border:0; box-shadow:none; background:none;" align=center >
+    <img id="person10" src="./sources/covid/person_black.png" width=100% style="position:absolute; top:27%; left:29%; width:2%; border:0; box-shadow:none; background:none;" align=center >
+    <img id="person11" src="./sources/covid/person_black.png" width=100% style="position:absolute; top:34%; left:25%; width:2%; border:0; box-shadow:none; background:none;" align=center >
+    <img id="person07" src="./sources/covid/person_red.png"   width=100% style="position:absolute; top:20%; left:50%; width:2%; border:0; box-shadow:none; background:none;" align=center >
+    <img id="person12" src="./sources/covid/person_red.png"   width=100% style="position:absolute; top:20%; left:52%; width:2%; border:0; box-shadow:none; background:none;" align=center >
+    <img id="person01" src="./sources/covid/person_red.png"   width=100% style="position:absolute; top:20%; left:54%; width:2%; border:0; box-shadow:none; background:none;" align=center >
+    <img id="person03" src="./sources/covid/person_red.png"   width=100% style="position:absolute; top:27%; left:50%; width:2%; border:0; box-shadow:none; background:none;" align=center >
+    <img id="person04" src="./sources/covid/person_green.png" width=100% style="position:absolute; top:20%; left:75%; width:2%; border:0; box-shadow:none; background:none;" align=center >
+    <div style="position:absolute; left:20%; top:08; width:15%; height:5%; text-align:center; padding-top:22%; border:solid">
+        <b>S</b>usceptible
+    </div>
+    <div style="position:absolute; left:45%; top:08%; width:15%; height:5%; text-align:center; padding-top:22%; border:solid">
+        <b>I</b>nfected
+    </div>
+    <div style="position:absolute; left:70%; top:08%; width:15%; height:5%; text-align:center; padding-top:22%; border:solid">
+        <b>R</b>ecovered
+    </div>
+    <!-- include the rates from left to right -->
+    <svg viewBox="0 0 350 100" style="position:absolute; top:5%; left:05%; width:90%;">
+      <defs>
+        <marker id="arrowhead3" markerWidth="10" markerHeight="7" 
+        refX="0" refY="3.5" orient="auto">
+          <polygon points="0 0, 10 3.5, 0 7" />
+        </marker>
+      </defs>
+      <line x1="110" y1="50" x2="160" y2="50" stroke="#000" 
+      stroke-width="1" marker-end="url(#arrowhead3)" />
+      <line x1="207" y1="50" x2="258" y2="50" stroke="#000" 
+      stroke-width="1" marker-end="url(#arrowhead3)" />
+    </svg>
+    <p  style="position:absolute; top:21%; left:35%; width:10%;"> $\lambda$ </p>
+    <p  style="position:absolute; top:27%; left:35%; width:10%;"> spreading rate</p>
+    <p  style="position:absolute; top:21%; left:60%; width:10%;"> $\mu$ </p>
+    <p  style="position:absolute; top:27%; left:60%; width:10%;"> recovery rate</p>
+    <span class="fragment fade-in" data-fragment-index="1">
+        <div style="position:absolute; left:0%; top:65%; width:48%; text-align:left;">
+            $$
+                S + I \overset{\lambda}{\to} I + I\\
+                I\overset{\mu}{\to} R 
+            $$
+        </div>
+    </span>
+    <span class="fragment fade-in-then-out" data-fragment-index="2">
+        <img src="./sources/weblogos/onlineTED.svg" width=40%  style="border:0; box-shadow:none; position:absolute; top:70%; left:60%">
+    </span>
+    <div style="position:absolute; left:45%; top:55%; width:55%; text-align:left;">
+        <span class="fragment fade-in" data-fragment-index="3">
+            Ansteckende Personen erholen sich zufällig mit rate $\mu$,<br>
+            $\to$ Gesamtrate Erholung $\mu I \phantom{\frac{S}{N}}$<br>
+        </span>
+        <br>
+        <span class="fragment fade-in" data-fragment-index="4">
+            Ansteckende Personen infizieren zufällig getroffene Person mit rate $\lambda$,<br>
+            $\to$ Gesamtrate Infektion $\lambda I \frac{S}{N}$<br>
+        </span>
+        <br>
+        <span class="fragment fade-in" data-fragment-index="5">
+            Gesamtrate beliebiges Ereignis $\left(\mu + \lambda \frac{S}{N}\right) I$<br>
+        </span>
+    </div>
+</section>
+
+<section style="min-height:1080px">
+    <img src="./sources/icon_part1.svg" height=12%  style="border:0; box-shadow:none; position:absolute; top:1%;right:1%" >
+    <h3>Monte Carlo 101: Nichtgleichgewicht</h3>
+    <div style="position:absolute; top:10%; left: 5%; width:90%; text-align:left" class="fragment fade-in" data-fragment-index="1">
+        Markov chain Monte Carlo Simulationen sind nur möglich, wenn es eine
+        stationäre Verteilung gibt. Also für Systeme im Gleichgewicht.
+    </div>
+
+    <div style="position:absolute; top:22%; left: 5%; width:90%; text-align:left" class="fragment fade-in" data-fragment-index="2">
+        Wir können Systeme im Nichtgleichgewicht dennoch simulieren, wenn wir
+        wissen wie sich die Wahrscheinlichkeitsverteilung über die Zeit ändert. 
+    </div>
+
+    <div style="position:absolute; top:35%; left: 5%; width:90%; text-align:left" class="fragment fade-in" data-fragment-index="3">
+        <b>Mastergleichung:</b> 
+        $\dot{P}(x,t) = \int dx^\prime \left[P(x^\prime)p(x^\prime\to x) - P(x)p(x\to x^\prime)\right]$
+    </div>
+
+    <div style="position:absolute; top:43%; left: 5%; width:90%; text-align:left" class="fragment fade-in" data-fragment-index="4">
+        <b>Kinetic Monte Carlo:</b> Simulation der Entwicklung der
+        Mastergleichung für iid Poisson Prozesse ($x\to x^\prime$) mit entsprechend bekannten raten $p(x\to x^\prime)$.
+    </div>
+
+    <div style="position:absolute; top:55%; left: 5%; width:60%; text-align:left" class="fragment fade-in" data-fragment-index="5">
+        Dies ist die Basis für chemische Reaktionsgleichungen<br> 
+        Beispiel: $S + I\to I + I$ mit rate $\lambda$, $I\to R$ mit rate $\mu$
+        $$\dot{P}(S,I,t) = \lambda\frac{(S+1)(I-1)}{N}P(S+1,I-1,t)\\
+        -\left(\lambda \frac{SI}{N}+\mu I\right)P(S,I,t)\\
+        +\mu (I+1)P(S,I+1,t)
+        $$
+        (Annahme: Massenwirkungsgesetz)
+    </div>
+    <span class="fragment fade-in" data-fragment-index="5">
+        <img src="./sources/custom/kineticMC_example_I0_10_distributions.png" width=30%  style="border:0; box-shadow:none; position:absolute; top:45%; left:70%">
+    </span>
+</section>
+
+<section style="min-height:1080px">
+    <img src="./sources/icon_part3.svg" height=12%  style="border:0; box-shadow:none; position:absolute; top:1%;right:1%" >
+    <h3>Simulation: Kinetic Monte Carlo (Gillespie)</h3>
+    <div data-markdown style="position:absolute; top:5%; left:2.5%; width:95%; text-align:left">
+    <script type="text/template">
+        Annahmen:
+        * Infektionen und Erholungen sind unabhängige Poissonprozesse<!-- .element: class="fragment fade-in" data-fragment-index="2" -->
+        * Well-mixed: Alle wechselwirken mit Allen.<!-- .element: class="fragment fade-in" data-fragment-index="3" -->
+    </script>
+    </div>
+    <!-- include illustration -->
+    <span class="fragment fade-in" data-fragment-index="10">
+        <img src="./sources/monte-carlo/kineticMonteCarlo_gillespie.svg" width=80%  style="border:0; box-shadow:none; position:absolute; top:17%; left:18%">
+    </span> 
+
+    <div style="position:absolute; top:50%; left:2.5%; width:92%; text-align:left">
+        <span class="fragment fade-in" data-fragment-index="10">
+        Algorithmus:
+        <br>
+        1. Erzeuge Anfangsbedingung ($S=S_0$, $I=I_0$, $R=R_0$) an $t=t_0$
+        </span>
+        <br>
+        <span class="fragment fade-in" data-fragment-index="11">
+            2. Berechne Raten $a=\left[\mu I, \lambda \frac{S}{N}I\right]$
+        </span>
+        <br>
+        <span class="fragment fade-in" data-fragment-index="12">
+            3. Ziehe Zeit zum nächsten Ereignis $\Delta t = \frac{1}{a_1+a_2}\ln\left(\frac{1}{r_1}\right)\sim \text{Exp} \left(\frac{1}{a_1+a_2}\right)$ mit $r_1\in[0,1)$ 
+        </span>
+        <br>
+        <span class="fragment fade-in" data-fragment-index="13">
+            4. Ziehe nächstes Ereignis $j$ sodass $\frac{1}{\sum_i a_i}\sum_{i=1}^j a_i < r_2\in[0,1)$<br>
+               Hier: Erholung wenn $r_2 < a_1/(a_1+a_2)\phantom{>}$ andernfalls Infektion 
+        </span>
+        <br>
+        <span class="fragment fade-in" data-fragment-index="14">
+            5. $t=t+\Delta t$ und realisiere Ereignis (Erholung: $I-1$, $R+1$; Infektion $S-1$, $I+1$).
+        </span>
+        <br>
+        <span class="fragment fade-in" data-fragment-index="15">
+            6. Falls $t < T\phantom{>}$ gehe zu 2.  
+        </span>
+    </div>
+</section>
+
+<section style="min-height:1080px">
+    <img src="./sources/icon_part3.svg" height=12%  style="border:0; box-shadow:none; position:absolute; top:1%;right:1%" >
+    <h3>Simulation: Gruppenarbeit</h3>
+        <div style="position:absolute; left:5%; top:10%; width:90%; text-align:left;">
+            Standardannahme, dass Alle mit Allen in Kontakt (well mixed), Infektion/Heilung unabhängige Poissonprozesse mit Reaktionsgleichungen
+            $$
+                S + I \overset{\lambda}{\to} I + I\\
+                I\overset{\mu}{\to} R 
+            $$
+        </div>
+
+        <div style="position:absolute; top:50%; left:5%; width:90%; text-align:left">
+            <span class="fragment fade-in" data-fragment-index="1">
+            1. Skiziert die zu erwarteten Infektionszahlen als Funktion der Zeit für $\lambda/\mu = 0.5, 1.0, 2.0$ ("Reproduktionszahl").
+            </span>
+            <br><br>
+            <span class="fragment fade-in" data-fragment-index="2">
+            2. Wie sieht für $\lambda/\mu=1.0$ eine typische Realisation der aktiven Infektionen $I$ aus?
+            </span>
+            <br><br>
+            <span class="fragment fade-in" data-fragment-index="3">
+            3. Was erwartet ihr, wenn nicht mehr Alle mit Allen wechselwirken
+            sondern die Ausbreitung auf einem (komplexen) Netzwerk stattfindet.
+            Zum Beispiel einem Ring? Welche Rolle hat $\lambda/\mu$ jetzt? Was
+            bedeutet $\lambda=\mu$?
+            </span>
+        </div>
+</section>
+
+
+<section style="min-height:1080px">
+    <img src="./sources/icon_part3.svg" height=12%  style="border:0; box-shadow:none; position:absolute; top:1%;right:1%" >
+    <h3>Simulation: Beispiele</h3>
+    <span class="fragment fade-out" data-fragment-index="15">
+        <span class="fragment fade-in" data-fragment-index="10">
+            <div style="position:absolute; top:12%; left:5%; width:90%">
+                $\mu=1/7$, $\lambda=2/7$, $N=10^5$, $R=0$, $I_0=10$<br>
+            </div>
+            <div style="position:absolute; top:20%; left:0%; width:50%">
+                <img src="./sources/custom/kineticMC_example_I0_10.png" width=100%  style="border:0; box-shadow:none;">
+            </div>
+        </span> 
+        <span class="fragment fade-in" data-fragment-index="11">
+            <div style="position:absolute; top:15%; left:50%; width:50%">
+                <img src="./sources/custom/kineticMC_example_I0_10_distributions.png" width=100%  style="border:0; box-shadow:none;">
+            </div>
+        </span> 
+    </span> 
+        <span class="fragment fade-in-then-out" data-fragment-index="15">
+            <img src="./sources/weblogos/onlineTED.svg" width=40%  style="border:0; box-shadow:none; position:absolute; top:40%; left:30%">
+        </span>
+        <span class="fragment fade-in" data-fragment-index="20">
+            <div style="position:absolute; top:12%; left:5%; width:90%">
+                $\mu=1/7$, $\lambda=2/7$, $N=10^5$, $R=0$, $I_0=1$<br>
+            </div>
+            <span class="fragment fade-out" data-fragment-index="22">
+            <div style="position:absolute; top:20%; left:0%; width:50%">
+                <img src="./sources/custom/kineticMC_example_I0_1.png" width=100%  style="border:0; box-shadow:none;">
+            </div>
+            </span> 
+        </span> 
+        <span class="fragment fade-in" data-fragment-index="21">
+            <div style="position:absolute; top:15%; left:50%; width:50%">
+                <img src="./sources/custom/kineticMC_example_I0_1_distributions.png" width=100%  style="border:0; box-shadow:none;">
+            </div>
+        </span> 
+        <span class="fragment fade-in" data-fragment-index="22">
+            <div style="position:absolute; top:25%; left:5%; width:50%; text-align:left">
+                Wir können die Wahrscheinlichkeit ausrechnen, dass eine einzelne Infektion keine weiteren verursacht:
+                <br>
+                <span class="fragment fade-in" data-fragment-index="23">
+                Verteilung infektiöse Periode $\Delta t$: <br>
+                $P(\Delta t) = \mu e^{-\mu\Delta t}$
+                </span>
+                <br><br>
+                <span class="fragment fade-in" data-fragment-index="24">
+                Wahrscheinlichkeit keine Infektion in $\Delta t$: $p(\text{no event}) = e^{-\lambda \Delta t}$
+                </span>
+                <br><br>
+                <span class="fragment fade-in" data-fragment-index="25">
+                Wahrscheinlichkeit keine Infektion:<br>
+                $ p =\int_0^\infty d\Delta t\, e^{-\lambda \Delta t}\, \mu e^{-\mu\Delta t}$
+                </span>
+                <span class="fragment fade-in" data-fragment-index="26">
+                    $\phantom{p} =\frac{\mu}{\mu+\lambda}\int_0^\infty d\Delta t\,(\mu+\lambda) e^{-(\mu+\lambda) \Delta t}$
+                </span>
+                <br>
+                <span class="fragment fade-in" data-fragment-index="27">
+                    $\phantom{p} =\frac{\mu}{\mu+\lambda}$
+                </span>
+            </div>
+        </span>
+</section>
+
+<section style="min-height:1080px">
+    <img src="./sources/icon_part3.svg" height=12%  style="border:0; box-shadow:none; position:absolute; top:1%;right:1%" >
+    <h3>Simulation: Mastergleichung vs Differentialgleichung</h3>
+    $\newcommand\mycolv[1]{\begin{bmatrix}#1\end{bmatrix}}$
+
+        <div style="position:absolute; left:2%; top:8%; width:98%; text-align:left;">
+            Mastergleichung:
+            <br>
+            $ \dot{P}(S,I,t) 
+            = \lambda\frac{(S+1)(I-1)}{N}P(S+1,I-1,t) +\mu (I+1)P(S,I+1,t)
+            - \left(\lambda \frac{SI}{N} + \mu I\right)P(S,I,t)$
+            <span class="fragment fade-in" data-fragment-index="1">
+            $ \dot{P}\left(x,t\right) 
+            = a_1\left(x-\nu_1\right)P\left(x-\nu_1,t\right)
+            + a_2\left(x-\nu_2\right)P\left(x-\nu_2,t\right)  
+            - a_1\left(x\right) P\left(x,t\right)
+            - a_2\left(x\right) P\left(x,t\right)
+            $
+            $ \phantom{\dot{P}\left(x,t\right)}
+            = \sum_j a_j\left(x-\nu_j\right)P\left(x-\nu_j,t\right) - a_j\left(x\right) P\left(x,t\right)
+            $
+            </span>
+
+            <br><br>
+            <span class="fragment fade-in" data-fragment-index="2">
+                Erwaruntgswert $\langle f(x)\rangle = \sum_x f(x) P(x,t)$, z.B. Mittelwert $\langle x\rangle = \sum_x x P(x,t)$
+            </span>
+            <br><br>
+            <span class="fragment fade-in" data-fragment-index="3">
+                $d\frac{\langle x\rangle}{dt} = \sum_x x \dot{P}(x,t)  
+                = \sum_x \sum_j x a_j\left(x-\nu_j\right)P\left(x-\nu_j,t\right) - x a_j\left(x\right) P\left(x,t\right)$ 
+            </span>
+            <span class="fragment fade-in" data-fragment-index="4">
+                $\phantom{d\frac{\langle x\rangle}{dt}= \sum_x x \dot{P}(x,t)}
+                  = \sum_j \sum_x (x+\nu_j) a_j\left(x\right)P\left(x,t\right) - x a_j\left(x\right) P\left(x,t\right)$ 
+            </span>
+            <span class="fragment fade-in" data-fragment-index="5">
+                $\phantom{d\frac{\langle x\rangle}{dt}= \sum_x x \dot{P}(x,t)}
+                  = \sum_j \nu_j\langle a_j\left(x(t)\right)\rangle\approx \sum_j \nu_ja_j\left(\langle x(t)\rangle\right)$ 
+            </span>
+            <br><br>
+            <span class="fragment fade-in" data-fragment-index="1">
+                In unserem Fall $x=\mycolv{S\\I}$, $\nu_1=\mycolv{-1\\1}$, $\nu_2=\mycolv{0\\-1}$, $a_1(x)=\lambda\frac{SI}{N}$, $a_2(x)=\mu I$
+            </span>
+            <br>
+            <span class="fragment fade-in" data-fragment-index="11">
+                $\qquad\qquad\qquad d\frac{\langle x\rangle}{dt} = \mycolv{dS/dt\\ dI/dt} = \mycolv{-1\\1}\lambda\frac{SI}{N}+\mycolv{0\\-1}\mu I = \mycolv{-\lambda \frac{S}{N} I\\ \left(\lambda \frac{S}{I} - \mu\right)I}$
+            </span>
+
+        </div>
+        <span class="fragment fade-out" data-fragment-index="1">
+            <div style="position:absolute; top:25%; left:30%; width:40%">
+                <img src="./sources/custom/kineticMC_example_I0_10_distributions.png" width=100%  style="border:0; box-shadow:none;">
+            </div>
+        </span> 
+
+    <div style="position:absolute; bottom:1%; left:1.0%; width=98%; text-align:left">
+      <small>
+        <br>
+        <span>Gillespie, Annu. Rev. Phys. Chem. (2007)</span><br>
+      </small>
+    </div>
+</section>
+
+<section style="min-height:1080px">
+    <img src="./sources/icon_part3.svg" height=12%  style="border:0; box-shadow:none; position:absolute; top:1%;right:1%" >
+    <h3>Simulation: Stochastisch vs Deterministisch</h3>
+    <div style="position:absolute; left:2%; top:15%; width:50%; text-align:left;">
+        Differentialgleichung:
+        $$
+            dS/dt = -\lambda\frac{S}{N} I\phantom{+\mu I}\\
+            dI/dt = \left(\lambda\frac{S}{N} -\mu \right)I\\
+            dR/dt = \phantom{+}\mu I \phantom{-\lambda\frac{S}{N} I}
+        $$
+    </div>
+    <div style="position:absolute; top:10%; left:50%; width:50%">
+        <img src="./sources/custom/kineticMC_example_I0_10_long.png" width=100%  style="border:0; box-shadow:none;">
+    </div>
+    
+    <div style="position:absolute; left:2%; top:70%; width:96%; text-align:left;">
+        <span class="fragment fade-in" data-fragment-index="1">
+            Annahmen: Raten sind linear bzgl. der Populationen (keine multi-molekularen Wechselwirkungen),
+            <br>
+            1. $\dot{P}(x,t) = \sum_j a_j(x-\nu_j)P(x-\nu_j,t)-a_j(x)P(x,t)$   <br>
+            2. $\sum_j \nu_j\langle a_j\left(x(t)\right)\rangle\approx \sum_j \nu_ja_j\left(\langle x(t)\rangle\right)$
+        </span>
+        <br><br>
+        <span class="fragment fade-in" data-fragment-index="2">
+            Hier also eine  Approximation weil $a_1(S,I) = \lambda SI/N$ und $S$, $I$ abhängig
+        </span>
+    </div>
+</section>
+
+<section style="min-height:1080px">
+    <img src="./sources/icon_part3.svg" height=12%  style="border:0; box-shadow:none; position:absolute; top:1%;right:1%" >
+    <h3>Simulation: Beyond well mixed</h3>
+    <div style="position:absolute; left:2%; top:15%; width:96%; text-align:left;" class="fragment fade-in" data-fragment-index="1">
+        In der Realität finden Krankheitsausbrüche in komplexen (sich zeitlich ändernden) Netzwerken statt.
+    </div>
+
+    <div data-markdown style="position:absolute; top:25%; left:2%; width:50%; text-align:left">
+    <script type="text/template">
+        * Soziale Netzwerke?<!-- .element: class="fragment fade-in" data-fragment-index="2" -->
+        * Gitter?<!-- .element: class="fragment fade-in" data-fragment-index="3" -->
+        * Ring?<!-- .element: class="fragment fade-in" data-fragment-index="4" -->
+    </script>
+    </div>
+
+    <span class="fragment fade-out" data-fragment-index="10">
+    <div style="position:absolute; top:45%; left:2%; width:50%; text-align:left">
+        <span class="fragment fade-in" data-fragment-index="5">
+            Beachte, dass in diesem Fall die Raten pro node spezifiziert werden:<br>
+            $a = [a_1, ...., a_N]$
+        </span>
+        <br><br>
+        <span class="fragment fade-in" data-fragment-index="6">
+            Für den Ring kann der Prozess mit jedem neuen Knoten wieder mit hoher Wahrscheinlichkeit 
+            aussterben:<br>
+            $p(\text{no subsequent infection}) = \frac{\mu}{\mu+\lambda}$
+        </span>
+    </div>
+    </span>
+
+    <span class="fragment fade-in-then-out" data-fragment-index="2">
+    <div style="position:absolute; top:25%; left:50%; width:50%">
+        <img src="./sources/covid/benmaier_SIR_example_network.gif" width=60%  style="border:0; box-shadow:none;">
+    </div>
+    </span>
+    <span class="fragment fade-in-then-out" data-fragment-index="3">
+    <div style="position:absolute; top:25%; left:50%; width:50%">
+        <img src="./sources/covid/benmaier_SIR_example_lattice.gif" width=60%  style="border:0; box-shadow:none;">
+    </div>
+    </span>
+    <span class="fragment fade-in" data-fragment-index="4">
+    <div style="position:absolute; top:25%; left:50%; width:50%">
+        <img src="./sources/covid/SIR_ring.svg" width=60%  style="border:0; box-shadow:none;">
+    </div>
+    </span>
+
+    <div style="position:absolute; top:65%; left:2%; width:100%; text-align:left">
+        <span class="fragment fade-in" data-fragment-index="10">
+            Die Schwierigkeit ist, dass alle diese Verfeinerungen Informationen
+            über die Struktur und auch Dynamik dieser Netzwerke brauchen.
+        </span>
+        <br>
+        <br>
+        <span class="fragment fade-in" data-fragment-index="11">
+            Manchmal bleibt einfacher doch besser ... vor allem wenn die Ergebnisse im Modellraum interpretiert werden.
+        </span>
+    </div>
+    
+    <div style="position:absolute; bottom:1%; left:1.0%; width=98%; text-align:left">
+      <small>
+        <br>
+        <span class="fragment fade-in" data-fragment-index="2">https://github.com/benmaier/epipack#examples</span><br>
+      </small>
+    </div>
+</section>
+
+<section style="min-height:1080px">
+    <img src="./sources/icon_part3.svg" height=12%  style="border:0; box-shadow:none; position:absolute; top:1%;right:1%" >
+    <h3>Simulation: Kurzer Einblick in nicht-markovianische Dynamik</h3>
+    <div class="fragment fade-in-then-out" data-fragment-index="1" style="position:absolute; top:12%; left:15%; width:70%">
+        <img src="./sources/covid/zierenberg_weibull_contact_trains.svg" width=100% style="clip-path:inset(00% 14.6% 0% 0%); border:0; box-shadow:none; background:none;" align=center >
+        <img src="./sources/weblogos/onlineTED.svg" width=40%  style="border:0; box-shadow:none; position:absolute; top:95%; left:30%">
+    </div>
+    <span class="fragment fade-out" data-fragment-index="10">
+    <div class="fragment fade-in" data-fragment-index="2" style="position:absolute; top:12%; left:15%; width:70%">
+        <img src="./sources/covid/zierenberg_weibull_contact_trains.svg" width=100% style="border:0; box-shadow:none; background:none;" align=center >
+    </div>
+    <div class="fragment fade-in" data-fragment-index="3" style="position:absolute; top:85%; left:2%; width:96%">
+        Nur Fall 2 (exponentielle inter-event Verteilung) kann mit Gillespie simuliert werden.
+        <br>
+        <span class="fragment fade-in" data-fragment-index="4">
+            Mögliche Alternative ist eine "event queue".
+        </span>
+    </div>
+    </span>
+    <div class="fragment fade-in" data-fragment-index="10" style="position:absolute; top:8%; left:5%; width:35%">
+        <img src="./sources/covid/zierenberg_weibull_contact_trains.svg" width=100% style="border:0; box-shadow:none; background:none;" align=center >
+    </div>
+    <div class="fragment fade-in-then-out" data-fragment-index="11" style="position:absolute; top:8%; left:55%; width:35%">
+        <img src="./sources/covid/2020_Cevik_disease_development.png" width=100%  style="border:0; box-shadow:none;" align=center>
+    </div>
+    <div class="fragment fade-in" data-fragment-index="12" style="position:absolute; top:8%; left:55%; width:35%">
+        <img src="./sources/covid/pre_zierenberg_contact_data_InVS15_probability_infectious.png" width=100%  style="border:0; box-shadow:none;" align=center>
+    </div>
+    <div class="fragment fade-in" data-fragment-index="13" style="position:absolute; top:48%; left:5%; width:35%">
+        <img src="./sources/covid/pre_zierenberg_Weibull_distribution_infectious-encounter_kr01.png" width=100%  style="border:0; box-shadow:none;" align=center>
+    </div>
+    <div class="fragment fade-in" data-fragment-index="13" style="position:absolute; top:48%; left:55%; width:35%">
+        <img src="./sources/covid/pre_zierenberg_Weibull_distribution_infectious-encounter_kr10.png" width=100%  style="border:0; box-shadow:none;" align=center>
+    </div>
+
+    <div style="position:absolute; bottom:1%; left:1.0%; width=98%; text-align:left">
+      <small>
+        <br>
+        <span class="fragment fade-in-then-out" data-fragment-index="11">Cevik et al., BMJ (2020).</span><br>
+      </small>
+    </div>
+</section>
+
+<section style="min-height:1080px">
+    <img src="./sources/icon_part3.svg" height=12%  style="border:0; box-shadow:none; position:absolute; top:1%;right:1%" >
+    <h3>Simulation: Was haben wir gelernt?</h3>
+    <div style="position:absolute; top:12%; left: 1%; width:50%; text-align:left" class="fragment fade-in" data-fragment-index="1" data-markdown>
+      <script type="text/template">
+        * Einzelne stochastische Realisierungen können sehr unterschiedlich sein.<!-- .element: class="fragment fade-in" data-fragment-index="1" -->
+        * Deterministische Beschreibung kann den Ensemble Erwartungswert approximieren.<!-- .element: class="fragment fade-in" data-fragment-index="2" -->
+        * Realität ist nicht ganz so einfach (komplexe, zeitlich ändernde Netzwerke, kein Poisson Krankheitsverlauf)<!-- .element: class="fragment fade-in" data-fragment-index="3" -->
+      </script>
+    </div>
+
+    <span class="fragment fade-in-then-out" data-fragment-index="1">
+        <img src="./sources/custom/kineticMC_example_I0_1.png" width=45%  style="border:0; box-shadow:none; position:absolute; top:12%; left:52%">
+    </span>
+    <span class="fragment fade-in-then-out" data-fragment-index="2">
+        <img src="./sources/custom/kineticMC_example_I0_10_long.png" width=45%  style="border:0; box-shadow:none; position:absolute; top:12%; left:52%">
+    </span>
+    <span class="fragment fade-in-then-out" data-fragment-index="3">
+        <img src="./sources/covid/pre_zierenberg_Weibull_distribution_infectious-encounter_kr10.png" width=45%  style="border:0; box-shadow:none; position:absolute; top:12%; left:52%">
+    </span>
+</section>
+
+<section style="min-height:1080px">
+    <h3>Zusammenfassung</h3>
+    <div style="position:absolute; top:10%; left:20%; width:60%; height:20%;  text-align:left; border:3px; border-style:solid; border-color:#708090; padding: 0.2em;">
+        <img src="./sources/icon_part1.svg" height=90% style="border:0; box-shadow:none; position:absolute; top:0%;left:2%" >
+        <h2 style="border:0; box-shadow:none; position:absolute; top:30%; left:28%">Monte Carlo 101</h2>
+    </div>
+
+    <div style="position:absolute; top:40%; left:20%; width:60%; height:20%;  text-align:left; border:3px; border-style:solid; border-color:#708090; padding: 0.2em;">
+        <img src="./sources/icon_part2.svg" height=90%  style="border:0; box-shadow:none; position:absolute; top:0%;left:2%" >
+        <h2 style="border:0; box-shadow:none; position:absolute; top:15%; left:28%">Inferenz Krankheitsparameter</h2>
+    </div>
+    
+    <div style="position:absolute; top:70%; left:20%; width:60%; height:20%;  text-align:left; border:3px; border-style:solid; border-color:#708090; padding: 0.2em;">
+        <img src="./sources/icon_part3.svg" height=90%  style="border:0; box-shadow:none; position:absolute; top:0%;left:2%" >
+        <h2 style="border:0; box-shadow:none; position:absolute; top:15%; left:28%">Simulation stochastischer Krankheitsausbreitung</h2>
+    </div>
+</section>
+
+<section style="min-height:1080px">
+    <h3>Hands-on Aufgaben</h3>
+    <div style="position:absolute; top:10%; left:5%; width:90%; text-align:left">
+        Gruppen a 3 Personen; bereitet bitte eine kurze Präsentation (max. 2 Minuten/2Slides) vor.
+        <br><br>
+        <span class="fragment fade-in" data-fragment-index="1">
+        1. Implementiert das stochastische SIR Modell mit dem Gillespie
+        Algorithmus und stellt die Ergebnisse grafisch dar. <br>
+        (z.B. $\mu=1/7$, $\lambda=2/7$, $N=10^5$, $R_0=0$, $I_0=10$, 1 Messpunkt pro Tag)
+        </span>
+        <br><br>
+        <span class="fragment fade-in" data-fragment-index="2">
+        2. Für welche Anfangsbedingungen wird es schwierig werden die
+        Modellparameter zu inferieren? Warum?
+        </span>
+        <br><br>
+        <span class="fragment fade-in" data-fragment-index="3">
+            Falls genügend Zeit wählt eines von den folgenden:
+            <br><br>
+            3a. Inferiert die Modellparameter mit Bayesian inference (exponential
+            growth, einfache Parameter updates wie im Beispiel)
+            <br><br>
+            3b. Implementiert change points in der stochastischen Simulation. Wie
+            wirkt sich das auf den Ensemblemittelwert aus? Und wie auf die
+            einzelnen Trajektorien? Welche Rolle spielt der "absorbing state"?
+        </span>
+    </div>
+</section>
+
+</div>
+</div>
+
+<script src="dist/reveal.js"></script>
+<script src="plugin/notes/notes.js"></script>
+<script src="plugin/markdown/markdown.js"></script>
+<script src="plugin/highlight/highlight.js"></script>
+<script src="plugin/math/math.js"></script>
+<script>
+    // More info about config & dependencies:
+    // - https://github.com/hakimel/reveal.js#configuration
+    // - https://github.com/hakimel/reveal.js#dependencies
+    Reveal.initialize({
+	    margin: 0.02,
+	    width:  1920,
+        height: 1080,
+	    center: false,
+	    viewDistance: 3,
+	    fragmentInURL: true,
+	    slideNumber:true,
+	    history:true,
+        transition:"none",
+        //transition:"convex",
+        //transitionSpeed:"normal",
+        transitionSpeed:"fast",
+
+        math: {
+    	    //mathjax: 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js',
+    	    mathjax: '/home/johannes/local_build/MathJax/MathJax.js',
+    	    config: 'TeX-AMS_HTML-full'  // See http://docs.mathjax.org/en/latest/config-files.html
+        },
+		plugins: [ RevealMath, RevealMarkdown ],
+		dependencies: [
+		  // Cross-browser shim that fully implements classList - https://github.com/eligrey/classList.js/
+            { src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+            // Interpret Markdown in <section> elements
+            { src: 'plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+            { src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+            // Syntax highlight for <code> elements
+            { src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+            // Zoom in and out with Alt+click
+            { src: 'plugin/zoom-js/zoom.js', async: true },
+            // Speaker notes
+            { src: 'plugin/notes/notes.js', async: true },
+            // MathJax
+            //{ src: 'plugin/math/math.js', async: true }
+		]
+	});
+</script>
+</body>
+</html>
